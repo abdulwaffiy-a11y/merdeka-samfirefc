@@ -3,6 +3,7 @@ import { UserPlus, Trash2, KeyRound, ShieldCheck, Lock, Unlock, Megaphone, Image
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Select, Badge, Dialog, useToast } from '../ui'
 import { api, getCsrf } from '../lib/api'
 import GaleriAdmin from './GaleriAdmin'
+import SandaranAdmin from './SandaranAdmin'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -107,6 +108,8 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
           <Button onClick={tukarPasswordSaya} disabled={tukarPass.baru.length < 8}>Tukar</Button>
         </CardBody>
       </Card>
+
+      <SandaranAdmin />
 
       <GaleriAdmin />
 

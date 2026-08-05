@@ -137,6 +137,29 @@ if ($hantar) {
         }
     }
 
+    /* ---- 3b. PENGADANG: jangan sekali-kali padam data hidup ---- */
+    if (!$ralat && $pdo) {
+        $adaData = 0;
+        foreach (array('pendaftaran', 'players') as $t) {
+            try { $adaData += (int)$pdo->query("SELECT COUNT(*) FROM `$t`")->fetchColumn(); }
+            catch (Exception $e) { /* jadual belum wujud */ }
+        }
+        try { $adaData += (int)$pdo->query("SELECT COUNT(*) FROM teams WHERE nama <> ''")->fetchColumn(); }
+        catch (Exception $e) {}
+        try { $adaData += (int)$pdo->query("SELECT COUNT(*) FROM matches WHERE status <> 'scheduled'")->fetchColumn(); }
+        catch (Exception $e) {}
+
+        if ($adaData > 0 && trim((string)($_POST['sahkan_padam'] ?? '')) !== 'PADAM SEMUA DATA') {
+            $ralat[] = '<strong>DIHENTIKAN UNTUK KESELAMATAN.</strong> Database ini sudah mengandungi data hidup '
+                     . '(' . $adaData . ' rekod: pendaftaran / pasukan / pemain / keputusan). '
+                     . 'Meneruskan akan <strong>MEMADAM SEMUANYA</strong>.<br><br>'
+                     . 'Jika tuan benar-benar mahu pasang semula dari kosong, taip <code>PADAM SEMUA DATA</code> '
+                     . 'dalam ruangan pengesahan di bawah. Jika tidak, tutup halaman ini dan padam fail '
+                     . '<code>api/pasang.php</code> dari server.';
+            $perluSahkanPadam = true;
+        }
+    }
+
     /* ---- 4. Import skema ---- */
     if (!$ralat && $pdo) {
         $sql = base64_decode(SKEMA_B64);
@@ -339,6 +362,16 @@ $verOk = version_compare(PHP_VERSION, '7.4.0', '>=');
 
       <label>Ulang kata laluan</label>
       <input name="apass2" type="password" required minlength="8">
+
+<?php if ($perluSahkanPadam): ?>
+      <div class="err" style="margin-top:18px">
+        <strong>Amaran:</strong> database sudah ada data. Untuk pasang semula dari kosong,
+        taip tepat <code>PADAM SEMUA DATA</code> di bawah. Semua pendaftaran, pasukan,
+        pemain dan keputusan akan hilang.
+      </div>
+      <label>Pengesahan padam</label>
+      <input name="sahkan_padam" placeholder="PADAM SEMUA DATA" autocomplete="off">
+<?php endif; ?>
 
       <button type="submit">Pasang Sistem Sekarang</button>
       <p class="hint" style="text-align:center;margin-top:12px">

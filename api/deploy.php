@@ -55,6 +55,7 @@ const SALIN_FAIL = [
     'api/auth.php',
     'api/daftar.php',
     'api/draw.php',
+    'api/backup.php',
     'api/galeri.php',
     'api/poster.php',
     'api/matches.php',
