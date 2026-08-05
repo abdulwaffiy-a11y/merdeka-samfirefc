@@ -35,7 +35,7 @@ function Memuat() {
 }
 
 function App() {
-  const { data, memuat, ralat, segarPada, segarSekarang } = useAwam()
+  const { data, memuat, menyegar, ralat, segarPada, segarSekarang } = useAwam()
   const [tab, setTab] = useState('beranda')
 
   if (memuat && !data) return <Memuat />
@@ -75,9 +75,10 @@ function App() {
           <button
             onClick={segarSekarang}
             title={segarPada ? `Dikemas kini ${segarPada.toLocaleTimeString('ms-MY')}` : 'Segarkan'}
-            className="rounded-lg p-2 text-stone-500 transition hover:bg-stone-100 active:scale-95 dark:hover:bg-stone-800"
+            disabled={menyegar}
+            className="rounded-lg p-2 text-stone-500 transition hover:bg-stone-100 active:scale-90 disabled:opacity-60 dark:hover:bg-stone-800"
           >
-            <RefreshCw className={`size-4 ${memuat ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`size-4 ${menyegar || memuat ? 'animate-spin' : ''}`} />
           </button>
         </div>
 

@@ -20,13 +20,15 @@ export function useAwam() {
     } catch { return null }
   })
   const [memuat, setMemuat] = useState(true)
+  const [menyegar, setMenyegar] = useState(false)
   const [ralat, setRalat] = useState(null)
   const [segarPada, setSegarPada] = useState(null)
 
   const etag = useRef(null)
   const jalan = useRef(true)
 
-  const ambil = useCallback(async () => {
+  const ambil = useCallback(async (manual = false) => {
+    if (manual) setMenyegar(true)
     try {
       const r = await api.awam(etag.current)
       if (!jalan.current) return
@@ -42,6 +44,7 @@ export function useAwam() {
       setRalat(e.message || 'Tidak dapat sambung ke pelayan.')
     } finally {
       if (jalan.current) setMemuat(false)
+      if (manual) setTimeout(() => { if (jalan.current) setMenyegar(false) }, 400)
     }
   }, [])
 
@@ -65,5 +68,5 @@ export function useAwam() {
     }
   }, [ambil])
 
-  return { data, memuat, ralat, segarPada, segarSekarang: ambil }
+  return { data, memuat, menyegar, ralat, segarPada, segarSekarang: () => ambil(true) }
 }

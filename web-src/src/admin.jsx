@@ -85,16 +85,24 @@ function Panel({ admin, keluar }) {
   const [awam, setAwam] = useState(null)
   const [perlawanan, setPerlawanan] = useState([])
   const [memuat, setMemuat] = useState(true)
+  const [menyegar, setMenyegar] = useState(false)
+  const [segarPada, setSegarPada] = useState(null)
 
-  const muat = useCallback(async () => {
+  const muat = useCallback(async (manual = false) => {
+    if (manual) setMenyegar(true)
     try {
       const [a, m] = await Promise.all([api.awam(), api.perlawananSenarai()])
       setAwam(a)
       setPerlawanan(m.perlawanan)
+      setSegarPada(new Date())
+      if (manual) toast('Data disegarkan.', 'ok')
     } catch (e) {
       if (e.kod === 401) { keluar(); return }
       toast(e.message, 'ralat')
-    } finally { setMemuat(false) }
+    } finally {
+      setMemuat(false)
+      if (manual) setTimeout(() => setMenyegar(false), 400)
+    }
   }, [keluar, toast])
 
   useEffect(() => {
@@ -126,8 +134,13 @@ function Panel({ admin, keluar }) {
             <p className="truncate text-[13px] font-bold leading-tight">Panel Admin</p>
             <p className="truncate text-[10px] text-white/60">{admin.nama} · {admin.role === 'super' ? 'Super Admin' : 'Admin'}</p>
           </div>
-          <button onClick={muat} className="rounded-lg p-2 text-white/70 hover:bg-white/10" title="Segarkan">
-            <RefreshCw className="size-4" />
+          <button
+            onClick={() => muat(true)}
+            disabled={menyegar}
+            className="rounded-lg p-2 text-white/70 transition hover:bg-white/10 active:scale-90 disabled:opacity-60"
+            title={segarPada ? `Dikemas kini ${segarPada.toLocaleTimeString('ms-MY')}` : 'Segarkan'}
+          >
+            <RefreshCw className={`size-4 ${menyegar ? 'animate-spin' : ''}`} />
           </button>
           <button onClick={keluar} className="rounded-lg p-2 text-white/70 hover:bg-white/10" title="Log keluar">
             <LogOut className="size-4" />

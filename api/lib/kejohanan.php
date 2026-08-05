@@ -187,9 +187,11 @@ function kiraKedudukan(array $pasukan, array $perlawanan): array
             $baris[$i]['kedudukan'] = $i + 1;
         }
 
-        // "perlu_undian" hanya bermakna jika ia menjejaskan tempat pertama
+        // "perlu_undian" hanya bermakna jika KUMPULAN SUDAH SELESAI dan
+        // seri itu menjejaskan tempat pertama. Sebelum kumpulan habis main,
+        // semua pasukan memang sama (0 mata) — itu bukan seri.
         $undianJejasJohan = false;
-        if (count($baris) >= 2) {
+        if ($siap && count($baris) >= 2) {
             $a = $baris[0];
             $b = $baris[1];
             if ($a['mata'] === $b['mata']
