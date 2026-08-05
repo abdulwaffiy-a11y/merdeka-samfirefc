@@ -1,0 +1,8 @@
+node_modules/
+web-src/dist/
+api/config.php
+api/config.local.php
+api/uploads/
+*.zip
+.DS_Store
+Thumbs.db

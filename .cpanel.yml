@@ -1,0 +1,14 @@
+---
+# Auto-deploy cPanel Git Version Control -> merdeka.samfirefc.com
+# config.php, pasang.php dan api/uploads/ TIDAK disentuh semasa deploy —
+# tetapan database, akaun admin & logo pasukan kekal selamat.
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/adampowe/merdeka.samfirefc.com
+    - /bin/mkdir -p $DEPLOYPATH/api/lib $DEPLOYPATH/sql
+    - /bin/cp -f index.html admin.html .htaccess favicon.ico apple-touch-icon.png logo-samfire.png $DEPLOYPATH/
+    - /bin/rm -rf $DEPLOYPATH/assets
+    - /bin/cp -R assets $DEPLOYPATH/
+    - /bin/cp -f api/admins.php api/auth.php api/daftar.php api/draw.php api/matches.php api/public.php api/teams.php api/undi_kumpulan.php $DEPLOYPATH/api/
+    - /bin/cp -f api/lib/boot.php api/lib/kejohanan.php api/lib/.htaccess $DEPLOYPATH/api/lib/
+    - /bin/cp -f sql/schema.sql $DEPLOYPATH/sql/

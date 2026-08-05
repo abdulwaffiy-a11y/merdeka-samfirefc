@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Tema SAMFIRE FC / PAKSY */
+  --color-maroon-50:  #fdf3f4;
+  --color-maroon-100: #fbe5e7;
+  --color-maroon-200: #f6ccd1;
+  --color-maroon-300: #eda3ac;
+  --color-maroon-400: #e07281;
+  --color-maroon-500: #cd4459;
+  --color-maroon-600: #b32b44;
+  --color-maroon-700: #7B1E2B;
+  --color-maroon-800: #661a25;
+  --color-maroon-900: #4d141c;
+
+  --color-navy-50:  #f2f5fa;
+  --color-navy-100: #e3e9f4;
+  --color-navy-500: #2a4478;
+  --color-navy-700: #1b2f56;
+  --color-navy-800: #132244;
+  --color-navy-900: #0d1730;
+
+  --color-gold-300: #e8d48a;
+  --color-gold-400: #d9bc55;
+  --color-gold-500: #C9A227;
+  --color-gold-600: #a9861d;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font-sans); }
+  /* Nombor sejajar dalam jadual kedudukan */
+  .tnum { font-variant-numeric: tabular-nums; }
+}
+
+@keyframes denyut {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .45; }
+}
+.animate-denyut { animation: denyut 1.4s ease-in-out infinite; }
+
+@keyframes masuk {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-masuk { animation: masuk .28s ease-out both; }
+
+@keyframes kilau {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-kilau {
+  background-image: linear-gradient(100deg, transparent 40%, rgba(201,162,39,.35) 50%, transparent 60%);
+  background-size: 200% 100%;
+  animation: kilau 1.6s linear infinite;
+}
+
+/* Skrol mendatar tanpa bar hodoh */
+.skrol-x { scrollbar-width: thin; }
+.skrol-x::-webkit-scrollbar { height: 6px; }
+.skrol-x::-webkit-scrollbar-thumb { background: rgba(120,113,108,.35); border-radius: 999px; }
