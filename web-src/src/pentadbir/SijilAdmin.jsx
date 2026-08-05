@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Award, Copy, ExternalLink, Trash2, PenLine, Check, RefreshCw } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Badge, useToast } from '../ui'
 import { getCsrf } from '../lib/api'
@@ -11,6 +11,20 @@ export default function SijilAdmin() {
   const [sibuk, setSibuk] = useState(false)
   const [ttd, setTtd] = useState({ nama_penandatangan: '', jawatan_penandatangan: '' })
   const [disalin, setDisalin] = useState(0)
+
+  /* Pratonton sijil: skalakan halaman A4 landskap (1123×794px) supaya muat lebar kad */
+  const kotakContoh = useRef(null)
+  const [skalaContoh, setSkalaContoh] = useState(0.3)
+  useEffect(() => {
+    const kira = () => {
+      const lebar = kotakContoh.current?.clientWidth
+      if (lebar) setSkalaContoh(Math.min(lebar / 1123, 460 / 794))
+    }
+    kira()
+    window.addEventListener('resize', kira)
+    return () => window.removeEventListener('resize', kira)
+  }, [data])
+  const tinggiContoh = Math.round(794 * skalaContoh)
 
   const ambil = async () => {
     try {
@@ -188,6 +202,43 @@ export default function SijilAdmin() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* ---- Contoh sijil ---- */}
+        <div>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <p className="text-[12px] font-semibold text-stone-600 dark:text-stone-400">
+              Contoh sijil <span className="font-normal text-stone-400">— rupa sebenar semasa dicetak</span>
+            </p>
+            <a
+              href={`${asasApi}/sijil.php?action=contoh`} target="_blank" rel="noreferrer"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-stone-300 px-2.5 py-1.5 text-[11px] font-semibold text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
+            >
+              <ExternalLink className="size-3.5" />Buka saiz penuh
+            </a>
+          </div>
+
+          <div
+            ref={kotakContoh}
+            className="grid place-items-center overflow-hidden rounded-xl border border-stone-200 bg-stone-100 p-3 dark:border-stone-800 dark:bg-stone-900"
+          >
+            <div style={{ width: Math.round(1123 * skalaContoh), height: tinggiContoh, overflow: 'hidden' }}>
+              <iframe
+                title="Contoh sijil"
+                src={`${asasApi}/sijil.php?action=contoh`}
+                scrolling="no"
+                style={{
+                  width: 1123, height: 794, border: 0,
+                  transform: `scale(${skalaContoh})`, transformOrigin: 'top left',
+                }}
+              />
+            </div>
+          </div>
+
+          <p className="mt-2 text-[11px] text-stone-400">
+            Nama, pasukan dan nombor sijil di atas hanya contoh. Tandatangan yang anda muat naik di atas
+            akan terus terpapar di sini — pratonton ini sentiasa ikut reka bentuk sebenar.
+          </p>
         </div>
 
         <p className="text-[11px] leading-relaxed text-stone-400">

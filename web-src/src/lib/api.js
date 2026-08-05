@@ -75,6 +75,7 @@ export const api = {
   daftarTolak: (id, catatan) => panggil('daftar.php', { action: 'tolak' }, { id, catatan }),
   daftarPadam: (id) => panggil('daftar.php', { action: 'padam' }, { id }),
   daftarBuka:  (buka) => panggil('daftar.php', { action: 'buka' }, { buka }),
+  daftarKemas: (badan) => panggil('daftar.php', { action: 'kemas' }, badan),
 
   undiKumpulanStatus: () => panggil('undi_kumpulan.php', { action: 'status' }),
   undiKumpulanJalan:  (senarai) => panggil('undi_kumpulan.php', { action: 'jalan' }, { senarai }),

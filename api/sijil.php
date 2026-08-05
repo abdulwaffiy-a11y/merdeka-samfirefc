@@ -175,6 +175,15 @@ if ($action === 'tetapan') {
 $token = (string)inp('t', '');
 $pasukan = pasukanDariToken($token);
 
+/* ---- MOD CONTOH: pratonton sijil untuk admin (tanpa perlu ada pasukan) ---- */
+$modContoh = ($action === 'contoh');
+if ($modContoh) {
+    wajibAdmin();
+    $pasukan = ['id' => 0, 'nama' => 'PASUKAN CONTOH FC', 'kumpulan' => 'A', 'slot' => 1,
+                'pengurus' => '', 'telefon' => '', 'logo' => ''];
+    $_GET['id'] = '7';
+}
+
 if (!$pasukan) {
     header_remove('Content-Type');
     header('Content-Type: text/html; charset=utf-8');
@@ -195,6 +204,10 @@ if (!$pasukan) {
 $st = db()->prepare('SELECT id, nama, no_jersi FROM players WHERE team_id = ? ORDER BY id');
 $st->execute([$pasukan['id']]);
 $pemain = $st->fetchAll();
+
+if ($modContoh) {
+    $pemain = [['id' => 7, 'nama' => 'Ahmad Bin Abdullah', 'no_jersi' => '10']];
+}
 
 $tet        = tetapanSemua();
 $namaKej    = $tet['nama_kejohanan'] ?? 'KEJOHANAN FUTSAL MERDEKA KEPALA BATAS 2026';
@@ -219,6 +232,7 @@ elseif ($akhir['ketiga'] === $pasukan['id'])     $pencapaian = 'TEMPAT KETIGA';
 elseif ($akhir['keempat'] === $pasukan['id'])    $pencapaian = 'TEMPAT KEEMPAT';
 
 $cetak = (string)inp('cetak', '');
+if ($modContoh) $cetak = 'pemain';
 
 header_remove('Content-Type');
 header('Content-Type: text/html; charset=utf-8');
@@ -237,6 +251,10 @@ body { margin: 0; background: #e7e5e4; font-family: Georgia, "Times New Roman", 
   box-shadow: 0 2px 14px rgba(0,0,0,.14);
 }
 .sijil:last-child { page-break-after: auto; }
+
+/* Mod pratonton (dalam iframe panel admin) — muat lebar tanpa skrol */
+body.pratonton { background: transparent; }
+body.pratonton .sijil { margin: 0; transform-origin: top left; box-shadow: none; }
 
 /* ---------- latar & bingkai ---------- */
 .kanvas { position: absolute; inset: 0;
@@ -473,13 +491,15 @@ if ($cetak !== '') {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= e($tajukHalaman) ?></title>
 <style><?= gayaSijil() ?></style>
-</head><body>
+</head><body<?= $modContoh ? ' class="pratonton"' : '' ?>>
+<?php if (!$modContoh): ?>
 <div class="bar">
   <h1><?= e($tajukHalaman) ?></h1>
   <button class="btn" onclick="window.print()">Cetak / Simpan PDF</button>
   <a class="btn putih" href="sijil.php?t=<?= e($token) ?>">Kembali</a>
   <p><?= $bilKad ?> muka surat &middot; Tekan <strong>Cetak</strong>, kemudian pilih destinasi <strong>&ldquo;Simpan sebagai PDF&rdquo;</strong>. Pastikan orientasi <strong>Landskap</strong> dan margin <strong>Tiada</strong>.</p>
 </div>
+<?php endif; ?>
 <?= $kad ?>
 </body></html><?php
     exit;

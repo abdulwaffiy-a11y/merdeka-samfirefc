@@ -205,6 +205,61 @@ if ($action === 'lulus') {
     ok();
 }
 
+if ($action === 'kemas') {
+    // Admin sunting butiran pendaftaran: nama pasukan, pengurus, telefon & senarai pemain.
+    // Jika pasukan sudah masuk slot (selepas undian), jadual `players` turut dikemas kini.
+    wajibPost();
+    semakCsrf();
+    $admin = wajibAdmin();
+
+    $id = (int)inp('id', 0);
+    $st = db()->prepare('SELECT * FROM pendaftaran WHERE id = ?');
+    $st->execute([$id]);
+    $d = $st->fetch();
+    if (!$d) fail('Pendaftaran tidak dijumpai.', 404);
+
+    $nama     = mb_substr(trim((string)inp('nama', $d['nama'])), 0, 80);
+    $pengurus = mb_substr(trim((string)inp('pengurus', $d['pengurus'])), 0, 80);
+    $telefon  = mb_substr(trim((string)inp('telefon', $d['telefon'])), 0, 30);
+    if (mb_strlen($nama) < 2) fail('Nama pasukan terlalu pendek.');
+
+    $masuk = inp('pemain', null);
+    $pemain = json_decode((string)$d['pemain_json'], true) ?: [];
+    if (is_array($masuk)) {
+        $pemain = [];
+        foreach ($masuk as $p) {
+            $n = mb_substr(trim((string)($p['nama'] ?? '')), 0, 80);
+            if ($n === '') continue;
+            $j = preg_replace('/[^0-9]/', '', (string)($p['no_jersi'] ?? ''));
+            $pemain[] = ['nama' => $n, 'no_jersi' => mb_substr((string)$j, 0, 4)];
+            if (count($pemain) >= 20) break;
+        }
+    }
+
+    $pdo = db();
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare('UPDATE pendaftaran SET nama = ?, pengurus = ?, telefon = ?, pemain_json = ? WHERE id = ?')
+            ->execute([$nama, $pengurus, $telefon, json_encode($pemain, JSON_UNESCAPED_UNICODE), $id]);
+
+        $teamId = (int)($d['team_id'] ?? 0);
+        if ($teamId > 0) {
+            $pdo->prepare('UPDATE teams SET nama = ?, pengurus = ?, telefon = ? WHERE id = ?')
+                ->execute([$nama, $pengurus, $telefon, $teamId]);
+            $pdo->prepare('DELETE FROM players WHERE team_id = ?')->execute([$teamId]);
+            $ins = $pdo->prepare('INSERT INTO players (team_id, nama, no_jersi) VALUES (?, ?, ?)');
+            foreach ($pemain as $p) $ins->execute([$teamId, $p['nama'], $p['no_jersi']]);
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        fail('Gagal menyimpan perubahan.', 500);
+    }
+
+    audit($admin, 'daftar_kemas', ['id' => $id, 'nama' => $nama, 'pemain' => count($pemain)]);
+    ok(['pemain' => $pemain, 'team_id' => (int)($d['team_id'] ?? 0)]);
+}
+
 if ($action === 'tolak') {
     wajibPost();
     semakCsrf();

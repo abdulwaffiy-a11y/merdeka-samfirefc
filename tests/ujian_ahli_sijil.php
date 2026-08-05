@@ -367,6 +367,80 @@ $tokKosong = $tokens[$idPasukan[2]];
 [$kodK, $htmlK] = getTeks("$BASE/api/sijil.php?t=$tokKosong");
 sahkan($kodK === 200, 'Pasukan tanpa pemain masih boleh buka pautan (tiada ralat)');
 
+
+/* ================================================================== */
+tajukUjian('C. Admin sunting nama pasukan & pemain (selepas pengurus daftar)');
+
+/* Pengurus hantar borang pendaftaran TANPA nama pemain */
+$ch = curl_init("$BASE/api/daftar.php?action=hantar");
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_TIMEOUT => 30,
+    CURLOPT_POSTFIELDS => ['nama' => 'SAMFIRE FC', 'pengurus' => 'MR ZAKI',
+                           'telefon' => '+60 19-488 4084', 'pemain' => '[]'],
+]);
+$dRaw = curl_exec($ch); curl_close($ch);
+$dDaftar = json_decode((string)$dRaw, true) ?: [];
+sahkan(!empty($dDaftar['ok']), 'Pengurus hantar pendaftaran pasukan', json_encode($dDaftar));
+
+$admin->segarkanCsrf();
+$urusD = $admin->get('/api/daftar.php', ['action' => 'urus']);
+$rek = null;
+foreach ($urusD['senarai'] ?? [] as $x) if ($x['nama'] === 'SAMFIRE FC') $rek = $x;
+sahkan($rek !== null, 'Pendaftaran dipapar kepada admin');
+sahkan(count($rek['pemain'] ?? []) === 0, 'Mula dengan 0 pemain');
+
+/* Admin TAMBAH pemain */
+$idD = (int)$rek['id'];
+$kemas = $admin->post('/api/daftar.php', ['action' => 'kemas'], [
+    'id' => $idD, 'nama' => 'SAMFIRE FC', 'pengurus' => 'MR ZAKI', 'telefon' => '+60 19-488 4084',
+    'pemain' => [
+        ['nama' => 'Zaki Rahman', 'no_jersi' => '1'],
+        ['nama' => 'Hakim Aziz',  'no_jersi' => '7'],
+        ['nama' => 'Faiz Osman',  'no_jersi' => '9'],
+    ],
+]);
+sahkan(!empty($kemas['ok']), 'Admin tambah 3 pemain', json_encode($kemas));
+sahkan(count($kemas['pemain'] ?? []) === 3, 'Tiga pemain disimpan');
+
+/* Admin BUANG seorang + UBAH nama */
+$kemas2 = $admin->post('/api/daftar.php', ['action' => 'kemas'], [
+    'id' => $idD, 'nama' => 'SAMFIRE FC A',
+    'pemain' => [
+        ['nama' => 'Zaki Rahman',   'no_jersi' => '1'],
+        ['nama' => 'Hakim Abdul Aziz', 'no_jersi' => '77'],
+    ],
+]);
+sahkan(!empty($kemas2['ok']), 'Admin buang seorang & betulkan nama');
+sahkan(count($kemas2['pemain'] ?? []) === 2, 'Tinggal 2 pemain');
+sahkan(($kemas2['pemain'][1]['nama'] ?? '') === 'Hakim Abdul Aziz', 'Nama pemain berjaya diubah');
+sahkan(($kemas2['pemain'][1]['no_jersi'] ?? '') === '77', 'No. jersi berjaya diubah');
+
+$urusD2 = $admin->get('/api/daftar.php', ['action' => 'urus']);
+$rek2 = null;
+foreach ($urusD2['senarai'] as $x) if ((int)$x['id'] === $idD) $rek2 = $x;
+sahkan(($rek2['nama'] ?? '') === 'SAMFIRE FC A', 'Nama pasukan dikemas kini dalam senarai');
+
+/* Nama kosong ditolak */
+$kosong = $admin->post('/api/daftar.php', ['action' => 'kemas'], ['id' => $idD, 'nama' => 'A']);
+sahkan(empty($kosong['ok']), 'Nama pasukan terlalu pendek ditolak');
+
+/* Baris kosong diabaikan, had 20 pemain dikuatkuasakan */
+$banyak = [];
+for ($i = 1; $i <= 25; $i++) $banyak[] = ['nama' => "Pemain $i", 'no_jersi' => (string)$i];
+$banyak[] = ['nama' => '   ', 'no_jersi' => '5'];
+$kemas3 = $admin->post('/api/daftar.php', ['action' => 'kemas'], ['id' => $idD, 'pemain' => $banyak]);
+sahkan(count($kemas3['pemain'] ?? []) === 20, 'Had maksimum 20 pemain dikuatkuasakan',
+       'dapat: ' . count($kemas3['pemain'] ?? []));
+
+/* Orang awam TIDAK boleh sunting */
+$curi3 = $tetamu->post('/api/daftar.php', ['action' => 'kemas'], ['id' => $idD, 'nama' => 'DIRAMPAS FC']);
+sahkan(empty($curi3['ok']), 'Orang awam tidak boleh sunting pendaftaran');
+
+/* Selepas diluluskan + masuk slot, suntingan menular ke jadual pasukan & sijil */
+$admin->segarkanCsrf();
+$lulusD = $admin->post('/api/daftar.php', ['action' => 'lulus'], ['id' => $idD]);
+sahkan(!empty($lulusD['ok']), 'Pendaftaran diluluskan');
+
 exit(ringkasanUjian());
 
 /** POST multipart menggunakan sesi admin sedia ada. */
