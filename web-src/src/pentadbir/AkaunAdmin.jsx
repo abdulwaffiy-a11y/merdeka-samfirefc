@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Select, Ba
 import { api, getCsrf } from '../lib/api'
 import GaleriAdmin from './GaleriAdmin'
 import SandaranAdmin from './SandaranAdmin'
+import SijilAdmin from './SijilAdmin'
+import AhliAdmin from './AhliAdmin'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -108,6 +110,10 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
           <Button onClick={tukarPasswordSaya} disabled={tukarPass.baru.length < 8}>Tukar</Button>
         </CardBody>
       </Card>
+
+      <AhliAdmin admin={admin} />
+
+      <SijilAdmin />
 
       <SandaranAdmin />
 

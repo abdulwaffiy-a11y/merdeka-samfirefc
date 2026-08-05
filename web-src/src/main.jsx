@@ -1,11 +1,11 @@
 import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Home, LayoutGrid, CalendarDays, GitBranch, Users, Info, RefreshCw, WifiOff, Lock, UserPlus } from 'lucide-react'
+import { Home, LayoutGrid, CalendarDays, GitBranch, Users, Info, RefreshCw, WifiOff, Lock, UserPlus, ShieldCheck } from 'lucide-react'
 import './styles.css'
 
 import { useAwam } from './lib/useAwam'
 import { LOGO } from './lib/util'
-import { Rangka, Badge } from './ui'
+import { Rangka, Badge, ToastProvider } from './ui'
 import Beranda from './awam/Beranda'
 import Kumpulan from './awam/Kumpulan'
 import Jadual from './awam/Jadual'
@@ -13,6 +13,7 @@ import Carta from './awam/Carta'
 import Pasukan from './awam/Pasukan'
 import Maklumat from './awam/Maklumat'
 import Daftar from './awam/Daftar'
+import Ahli from './awam/Ahli'
 
 const TAB = [
   { id: 'beranda',  label: 'Utama',    ikon: Home },
@@ -58,6 +59,7 @@ function App() {
     carta:    <Carta data={data} />,
     pasukan:  <Pasukan data={data} />,
     daftar:   <Daftar data={data} />,
+    ahli:     <Ahli />,
     info:     <Maklumat data={data} />,
   }[tab]
 
@@ -71,7 +73,20 @@ function App() {
             <p className="truncate text-[13px] font-bold leading-tight">Merdeka Kepala Batas 2026</p>
             <p className="truncate text-[10px] text-stone-500">Anjuran SAMFIRE FC · 30 Ogos 2026</p>
           </div>
-          {data.tetapan.dikunci && <Badge jenis="navy" className="hidden sm:inline-flex"><Lock className="size-3" />Keputusan Rasmi</Badge>}
+          {data.tetapan.dikunci && <Badge jenis="navy" className="hidden lg:inline-flex"><Lock className="size-3" />Keputusan Rasmi</Badge>}
+          <button
+            onClick={() => setTab('ahli')}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2 text-[12px] font-bold transition active:scale-95 sm:px-3.5 sm:text-[13px] ${
+              tab === 'ahli'
+                ? 'bg-navy-800 text-white'
+                : 'bg-gold-500 text-navy-900 hover:bg-gold-400'
+            }`}
+            title="Daftar sebagai ahli SAMFIRE FC"
+          >
+            <ShieldCheck className="size-4 shrink-0" />
+            <span className="hidden xs:inline">Jadi Ahli</span>
+            <span className="xs:hidden">Ahli</span>
+          </button>
           <button
             onClick={segarSekarang}
             title={segarPada ? `Dikemas kini ${segarPada.toLocaleTimeString('ms-MY')}` : 'Segarkan'}
@@ -138,4 +153,8 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>)
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <ToastProvider><App /></ToastProvider>
+  </StrictMode>,
+)
