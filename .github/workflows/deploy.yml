@@ -1,41 +1,30 @@
 name: Deploy ke merdeka.samfirefc.com
 
-# Setiap kali push ke main, fail sistem dihantar ke server melalui FTP.
-# Fail hidup (config.php, uploads/, pasang.php) sengaja TIDAK disentuh.
+# Firewall hos menutup FTP/SSH dari luar, jadi GitHub tidak boleh tolak fail
+# ke server. Sebaliknya kita suruh server TARIK sendiri kod terkini dari
+# GitHub melalui HTTPS (sambungan keluar — sentiasa dibenarkan).
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:        # boleh juga jalankan manual dari tab Actions
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Ambil kod
-        uses: actions/checkout@v4
-
-      - name: Hantar ke server melalui FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server:   ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          protocol: ftps
-          port: 21
-          local-dir: ./
-          server-dir: ./
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            web-src/**
-            tests/**
-            tools/**
-            README.md
-            PANDUAN-PEMASANGAN.md
-            .cpanel.yml
-            api/config.php
-            api/pasang.php
-            api/uploads/**
+      - name: Suruh server tarik kod terkini
+        run: |
+          echo "Memanggil endpoint deploy..."
+          kod=$(curl -sS --max-time 180 -w '\n%{http_code}' \
+            "https://merdeka.samfirefc.com/api/deploy.php?kunci=${{ secrets.DEPLOY_KEY }}" \
+            -o /tmp/hasil.json | tail -1)
+          echo "HTTP $kod"
+          cat /tmp/hasil.json
+          echo
+          if [ "$kod" != "200" ]; then
+            echo "::error::Deploy gagal (HTTP $kod)"
+            exit 1
+          fi
+          grep -q '"ok":true' /tmp/hasil.json || { echo "::error::Server melaporkan kegagalan"; exit 1; }
+          echo "Deploy berjaya."
