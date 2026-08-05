@@ -208,7 +208,7 @@ export default function Ahli() {
                   </div>
                   <div>
                     <Label>Pemain idola</Label>
-                    <Input maxLength={120} value={f.pemain_idola} onChange={set('pemain_idola')} placeholder="cth: Safawi Rasid" />
+                    <Input maxLength={120} value={f.pemain_idola} onChange={set('pemain_idola')} placeholder="cth: Messi, Ronaldo" />
                   </div>
                 </div>
               </div>
