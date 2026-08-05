@@ -1,0 +1,41 @@
+name: Deploy ke merdeka.samfirefc.com
+
+# Setiap kali push ke main, fail sistem dihantar ke server melalui FTP.
+# Fail hidup (config.php, uploads/, pasang.php) sengaja TIDAK disentuh.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # boleh juga jalankan manual dari tab Actions
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil kod
+        uses: actions/checkout@v4
+
+      - name: Hantar ke server melalui FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server:   ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          protocol: ftps
+          port: 21
+          local-dir: ./
+          server-dir: ./
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            web-src/**
+            tests/**
+            tools/**
+            README.md
+            PANDUAN-PEMASANGAN.md
+            .cpanel.yml
+            api/config.php
+            api/pasang.php
+            api/uploads/**
