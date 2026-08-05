@@ -13,6 +13,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS audit_log;
 DROP TABLE IF EXISTS login_attempts;
+DROP TABLE IF EXISTS galeri;
 DROP TABLE IF EXISTS pendaftaran;
 DROP TABLE IF EXISTS draw;
 DROP TABLE IF EXISTS matches;
@@ -33,17 +34,18 @@ CREATE TABLE settings (
 
 INSERT INTO settings (k, v) VALUES
   ('nama_kejohanan',   'KEJOHANAN FUTSAL MERDEKA KEPALA BATAS 2026'),
-  ('nama_penganjur',   'SAMFIRE FC dengan kerjasama PAKSY, Kepala Batas'),
+  ('nama_penganjur',   'Anjuran SAMFIRE FC · kerjasama PAKSY · tajaan YB Dato\' Seri Reezal Merican'),
   ('tarikh_kejohanan', '2026-08-30'),
   ('masa_mula',        '08:30'),
   ('lokasi',           'Gelanggang Futsal PAKSY, Kepala Batas, Pulau Pinang'),
   ('keputusan_dikunci','0'),
   ('pengumuman',       ''),
   ('pendaftaran_buka', '1'),
-  ('yuran',            'RM150'),
+  ('yuran',            'RM200'),
   ('telefon_urusetia', '019-123 4567'),
   ('url_website',      'https://samfirefc.com'),
-  ('url_daftar_ahli',  'https://samfirefc.com');
+  ('url_daftar_ahli',  'https://samfirefc.com'),
+  ('poster',           '');
 
 -- ---------------------------------------------------------------------
 -- Akaun admin (tiada pendaftaran terbuka — seed melalui setup.php sahaja)
@@ -225,6 +227,21 @@ CREATE TABLE pendaftaran (
   created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY idx_daftar_status (status),
   KEY idx_daftar_ip (ip, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- Galeri gambar kejohanan (dimuat naik oleh admin)
+-- ---------------------------------------------------------------------
+CREATE TABLE galeri (
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  fail        VARCHAR(120) NOT NULL,
+  thumb       VARCHAR(120) NOT NULL DEFAULT '',
+  kapsyen     VARCHAR(160) NOT NULL DEFAULT '',
+  lebar       INT NOT NULL DEFAULT 0,
+  tinggi      INT NOT NULL DEFAULT 0,
+  dimuat_oleh VARCHAR(100) NOT NULL DEFAULT '',
+  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_galeri_masa (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------

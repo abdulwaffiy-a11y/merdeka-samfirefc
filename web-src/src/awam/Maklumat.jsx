@@ -43,7 +43,7 @@ export default function Maklumat({ data }) {
           ))}
         </div>
         <div className="border-t border-stone-200 px-4 py-2.5 text-[11px] text-stone-500 dark:border-stone-800">
-          Jumlah wang tunai: <strong>RM2,500</strong> + medal &amp; piala.
+          Jumlah wang tunai: <strong>RM2,500</strong> + medal. Tiada piala pusingan.
         </div>
       </Card>
 
@@ -67,7 +67,7 @@ export default function Maklumat({ data }) {
         <CardBody className="space-y-3 text-[13px] text-stone-600 dark:text-stone-400">
           <ul className="list-disc space-y-1 pl-5">
             <li>Terbuka kepada penduduk yang menetap di <strong>Kepala Batas</strong>.</li>
-            <li>Yuran penyertaan <strong>RM150</strong> setiap pasukan · maksimum <strong>10 pemain</strong>.</li>
+            <li>Yuran penyertaan <strong>RM200</strong> setiap pasukan · maksimum <strong>10 pemain</strong>.</li>
             <li>Wajib menutup aurat sepanjang pertandingan.</li>
             <li>24 pasukan · 8 kumpulan (A–H) · 3 pasukan setiap kumpulan.</li>
             <li>Liga satu pusingan dalam kumpulan — 3 perlawanan setiap kumpulan.</li>
@@ -98,11 +98,24 @@ export default function Maklumat({ data }) {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Penganjur</CardTitle></CardHeader>
-        <CardBody className="space-y-1 text-[13px] text-stone-600 dark:text-stone-400">
-          <p className="font-semibold text-stone-800 dark:text-stone-200">{data.tetapan.nama_penganjur}</p>
-          <p>{data.tetapan.lokasi}</p>
-          <p>Telefon gelanggang: 019-555 2535</p>
+        <CardHeader><CardTitle>Penganjur & Penaja</CardTitle></CardHeader>
+        <CardBody className="space-y-2 text-[13px] text-stone-600 dark:text-stone-400">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Anjuran</p>
+            <p className="font-semibold text-stone-800 dark:text-stone-200">SAMFIRE FC</p>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Dengan kerjasama</p>
+            <p className="font-semibold text-stone-800 dark:text-stone-200">Pusat Kecemerlangan As-Syafiee (PAKSY)</p>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Tajaan</p>
+            <p className="font-semibold text-stone-800 dark:text-stone-200">YB Dato&apos; Seri Reezal Merican</p>
+          </div>
+          <div className="border-t border-stone-100 pt-2 dark:border-stone-800">
+            <p>{data.tetapan.lokasi}</p>
+            {data.tetapan.telefon_urusetia && <p>Urus setia: {data.tetapan.telefon_urusetia}</p>}
+          </div>
         </CardBody>
       </Card>
     </div>

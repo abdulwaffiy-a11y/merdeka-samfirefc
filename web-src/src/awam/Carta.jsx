@@ -1,4 +1,4 @@
-import { Trophy, Medal } from 'lucide-react'
+import { Medal, Award } from 'lucide-react'
 import { Card, Badge, BadgeLive } from '../ui'
 import { petaPasukan, namaSisi, masaMy, kodPapar, pemenangId } from '../lib/util'
 
@@ -78,7 +78,7 @@ export default function Carta({ data }) {
         <Card className="overflow-hidden">
           <div className="grid grid-cols-2 divide-x divide-stone-200 sm:grid-cols-4 dark:divide-stone-800">
             {[
-              ['Johan', ka.johan, Trophy, 'text-gold-500'],
+              ['Johan', ka.johan, Award, 'text-gold-500'],
               ['Naib Johan', ka.naib_johan, Medal, 'text-stone-400'],
               ['Tempat Ke-3', ka.ketiga, Medal, 'text-amber-700'],
               ['Tempat Ke-4', ka.keempat, null, ''],

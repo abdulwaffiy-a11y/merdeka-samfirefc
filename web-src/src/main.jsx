@@ -69,7 +69,7 @@ function App() {
           <img src={LOGO} alt="SAMFIRE FC" className="size-9 shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-bold leading-tight">Merdeka Kepala Batas 2026</p>
-            <p className="truncate text-[10px] text-stone-500">Kejohanan Futsal PAKSY · 30 Ogos 2026</p>
+            <p className="truncate text-[10px] text-stone-500">Anjuran SAMFIRE FC · 30 Ogos 2026</p>
           </div>
           {data.tetapan.dikunci && <Badge jenis="navy" className="hidden sm:inline-flex"><Lock className="size-3" />Keputusan Rasmi</Badge>}
           <button

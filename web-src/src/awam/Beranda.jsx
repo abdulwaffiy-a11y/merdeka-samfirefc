@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Trophy, MapPin, CalendarDays, Radio, Clock } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Badge, BadgeLive, Kosong } from '../ui'
+import Galeri from './Galeri'
 import { petaPasukan, namaSisi, teksSkor, masaMy, tarikhMy, kiraUndur, PERINGKAT_PENDEK, kodPapar, pemenangId, LOGO } from '../lib/util'
 
 function KotakUndur({ tarikh, masaMula }) {
@@ -69,7 +70,10 @@ export default function Beranda({ data, keTab }) {
             {t.nama_kejohanan}
           </h1>
           <p className="mt-1.5 text-[13px] font-bold uppercase tracking-wide text-gold-300">
-            Anjuran SAMFIRE FC <span className="font-medium normal-case text-white/70">· dengan kerjasama PAKSY</span>
+            Anjuran SAMFIRE FC
+          </p>
+          <p className="mt-1 text-[12px] leading-snug text-white/75">
+            Dengan kerjasama PAKSY · Tajaan <span className="font-semibold text-white/90">YB Dato' Seri Reezal Merican</span>
           </p>
           <div className="mt-3 space-y-1.5 text-[13px] text-white/80">
             <p className="flex items-center gap-2"><CalendarDays className="size-3.5 shrink-0" />{tarikhMy(t.tarikh_kejohanan)} · bermula {masaMy(t.masa_mula)}</p>
@@ -83,6 +87,24 @@ export default function Beranda({ data, keTab }) {
         <div className="rounded-xl border border-gold-500/40 bg-gold-500/10 px-4 py-3 text-sm font-medium text-gold-600 dark:text-gold-300">
           📣 {t.pengumuman}
         </div>
+      )}
+
+      {/* ---- Poster kejohanan ---- */}
+      {t.poster && (
+        <a
+          href={t.poster}
+          target="_blank"
+          rel="noreferrer"
+          title="Tekan untuk lihat saiz penuh"
+          className="block overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 shadow-sm transition hover:shadow-md dark:border-stone-800 dark:bg-stone-900"
+        >
+          <img
+            src={t.poster}
+            alt="Poster Kejohanan Futsal Merdeka Kepala Batas 2026"
+            className="mx-auto block h-auto w-full max-w-md object-contain"
+            loading="lazy"
+          />
+        </a>
       )}
 
       {/* ---- Juara ---- */}
@@ -196,7 +218,7 @@ export default function Beranda({ data, keTab }) {
         <div className="grid gap-x-4 gap-y-2 p-4 text-[12.5px] text-stone-600 sm:grid-cols-2 dark:text-stone-400">
           {[
             'Terbuka kepada penduduk yang menetap di Kepala Batas',
-            'Yuran RM150 setiap pasukan · maksimum 10 pemain',
+            'Yuran RM200 setiap pasukan · maksimum 10 pemain',
             'Format: liga berkumpulan, kemudian kalah mati',
             'Masa perlawanan: 5 minit · rehat 1 minit · 5 minit',
             'Mata sama? Keputusan bersemuka (head-to-head) diguna dahulu',
@@ -212,6 +234,9 @@ export default function Beranda({ data, keTab }) {
           ))}
         </div>
       </Card>
+
+      {/* ---- Galeri gambar ---- */}
+      <Galeri />
     </div>
   )
 }

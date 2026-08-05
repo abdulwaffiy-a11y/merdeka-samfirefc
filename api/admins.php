@@ -129,7 +129,8 @@ switch ($action) {
         if ($kunci !== null) {
             setTetapan('keputusan_dikunci', ((bool)$kunci) ? '1' : '0');
         }
-        foreach (['nama_kejohanan', 'nama_penganjur', 'tarikh_kejohanan', 'lokasi'] as $k) {
+        foreach (['nama_kejohanan', 'nama_penganjur', 'tarikh_kejohanan', 'lokasi',
+                  'yuran', 'telefon_urusetia', 'url_website', 'url_daftar_ahli'] as $k) {
             $v = inp($k, null);
             if ($v !== null) setTetapan($k, mb_substr((string)$v, 0, 200));
         }

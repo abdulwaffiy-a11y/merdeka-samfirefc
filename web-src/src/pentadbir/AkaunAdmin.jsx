@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
-import { UserPlus, Trash2, KeyRound, ShieldCheck, Lock, Unlock, Megaphone } from 'lucide-react'
+import { UserPlus, Trash2, KeyRound, ShieldCheck, Lock, Unlock, Megaphone, Image as ImageIcon } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Select, Badge, Dialog, useToast } from '../ui'
-import { api } from '../lib/api'
+import { api, getCsrf } from '../lib/api'
+import GaleriAdmin from './GaleriAdmin'
+
+const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
 export default function AkaunAdmin({ admin, awam, muatSemula }) {
   const toast = useToast()
@@ -12,6 +15,46 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
   const [passBaru, setPassBaru] = useState('')
   const [pengumuman, setPengumuman] = useState(awam.tetapan.pengumuman || '')
   const [tukarPass, setTukarPass] = useState({ lama: '', baru: '' })
+  const [naikSibuk, setNaikSibuk] = useState(false)
+  const [butiran, setButiran] = useState({
+    yuran: awam.tetapan.yuran || '',
+    telefon_urusetia: awam.tetapan.telefon_urusetia || '',
+    url_website: awam.tetapan.url_website || '',
+    url_daftar_ahli: awam.tetapan.url_daftar_ahli || '',
+  })
+
+  const naikPoster = async (fail) => {
+    if (!fail) return
+    if (fail.size > 4194304) { toast('Poster melebihi 4MB.', 'ralat'); return }
+    setNaikSibuk(true)
+    try {
+      const fd = new FormData()
+      fd.append('poster', fail)
+      const r = await fetch(`${asasApi}/poster.php?action=naik`, {
+        method: 'POST', body: fd, credentials: 'same-origin',
+        headers: { 'X-CSRF-Token': getCsrf() || '' },
+      })
+      const d = await r.json()
+      if (!d.ok) throw new Error(d.mesej || 'Muat naik gagal.')
+      toast(`Poster dimuat naik (${d.dimensi}).`, 'ok')
+      muatSemula()
+    } catch (e) { toast(e.message, 'ralat') } finally { setNaikSibuk(false) }
+  }
+
+  const buangPoster = async () => {
+    if (!confirm('Buang poster dari halaman utama?')) return
+    try {
+      const r = await fetch(`${asasApi}/poster.php?action=buang`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrf() || '' },
+        body: '{}',
+      })
+      const d = await r.json()
+      if (!d.ok) throw new Error(d.mesej)
+      toast('Poster dibuang.', 'ok')
+      muatSemula()
+    } catch (e) { toast(e.message, 'ralat') }
+  }
 
   const ambil = async () => {
     try { setSenarai((await api.adminSenarai()).admins) } catch (e) { toast(e.message, 'ralat') }
@@ -65,12 +108,70 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
         </CardBody>
       </Card>
 
+      <GaleriAdmin />
+
       {admin.role !== 'super' ? (
         <Card className="p-6 text-center text-sm text-stone-500">
           Pengurusan akaun dan tetapan kejohanan hanya boleh diakses oleh Super Admin.
         </Card>
       ) : (
         <>
+          {/* ---- Poster ---- */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><ImageIcon className="size-4" />Poster Kejohanan</CardTitle>
+              {awam.tetapan.poster && <Badge jenis="hijau">Dipaparkan</Badge>}
+            </CardHeader>
+            <CardBody className="space-y-3">
+              <p className="text-[12px] text-stone-500">
+                Dipaparkan di halaman Utama, di bawah kotak merah. Saiz disyorkan <strong>1080 × 1350 px</strong> (nisbah 4:5) —
+                muat penuh lebar telefon tanpa terlalu tinggi. Apa-apa saiz diterima; sistem kecilkan sendiri kepada lebar 1080px.
+                Maksimum 4MB, format JPG / PNG / WEBP.
+              </p>
+              <div className="flex flex-wrap items-start gap-4">
+                {awam.tetapan.poster && (
+                  <img src={awam.tetapan.poster} alt="" className="w-28 rounded-lg border border-stone-200 dark:border-stone-700" />
+                )}
+                <div className="flex min-w-48 flex-1 flex-col gap-2">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => naikPoster(e.target.files?.[0])}
+                    className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
+                  />
+                  {naikSibuk && <p className="text-[12px] text-stone-500">Memuat naik…</p>}
+                  {awam.tetapan.poster && (
+                    <Button jenis="garis" ukuran="sm" className="self-start" onClick={buangPoster}>
+                      <Trash2 className="size-3.5" />Buang poster
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* ---- Butiran kejohanan ---- */}
+          <Card>
+            <CardHeader><CardTitle>Butiran Kejohanan</CardTitle></CardHeader>
+            <CardBody className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['yuran', 'Yuran penyertaan', 'RM200'],
+                ['telefon_urusetia', 'Telefon urus setia', '019-123 4567'],
+                ['url_website', 'URL laman web SAMFIRE FC', 'https://samfirefc.com'],
+                ['url_daftar_ahli', 'URL daftar ahli SAMFIRE FC', 'https://samfirefc.com/daftar'],
+              ].map(([k, label, ph]) => (
+                <div key={k}>
+                  <Label>{label}</Label>
+                  <div className="flex gap-2">
+                    <Input value={butiran[k] ?? ''} placeholder={ph}
+                           onChange={(e) => setButiran({ ...butiran, [k]: e.target.value })} />
+                    <Button ukuran="sm" onClick={() => simpanTetapan({ [k]: butiran[k] ?? '' })}>Simpan</Button>
+                  </div>
+                </div>
+              ))}
+            </CardBody>
+          </Card>
+
           {/* ---- Pengumuman & kunci ---- */}
           <Card>
             <CardHeader><CardTitle className="flex items-center gap-2"><Megaphone className="size-4" />Pengumuman & Kunci Keputusan</CardTitle></CardHeader>

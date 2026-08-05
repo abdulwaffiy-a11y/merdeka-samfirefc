@@ -1,8 +1,14 @@
-name: Deploy ke merdeka.samfirefc.com
+name: Beritahu server ada kod baharu
 
-# Firewall hos menutup FTP/SSH dari luar, jadi GitHub tidak boleh tolak fail
-# ke server. Sebaliknya kita suruh server TARIK sendiri kod terkini dari
-# GitHub melalui HTTPS (sambungan keluar — sentiasa dibenarkan).
+# Hos merdeka.samfirefc.com ada perlindungan anti-bot yang menyekat
+# panggilan HTTP dari GitHub Actions, dan firewall menutup FTP/SSH dari
+# luar. Jadi kaedah sebenar ialah CRON di server:
+#
+#   */5 * * * * /usr/local/bin/php \
+#     /home/adampowe/merdeka.samfirefc.com/api/deploy.php --cron
+#
+# Cron itu menyemak commit terkini setiap 5 minit dan menarik kod bila
+# ada perubahan. Workflow ini hanya mencatat bahawa commit baharu wujud.
 
 on:
   push:
@@ -10,21 +16,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  maklum:
     runs-on: ubuntu-latest
     steps:
-      - name: Suruh server tarik kod terkini
+      - name: Catat commit baharu
         run: |
-          echo "Memanggil endpoint deploy..."
-          kod=$(curl -sS --max-time 180 -w '\n%{http_code}' \
-            "https://merdeka.samfirefc.com/api/deploy.php?kunci=${{ secrets.DEPLOY_KEY }}" \
-            -o /tmp/hasil.json | tail -1)
-          echo "HTTP $kod"
-          cat /tmp/hasil.json
-          echo
-          if [ "$kod" != "200" ]; then
-            echo "::error::Deploy gagal (HTTP $kod)"
-            exit 1
-          fi
-          grep -q '"ok":true' /tmp/hasil.json || { echo "::error::Server melaporkan kegagalan"; exit 1; }
-          echo "Deploy berjaya."
+          echo "Commit baharu: ${GITHUB_SHA:0:7}"
+          echo "Server akan menariknya dalam masa 5 minit melalui cron."
+          echo "Untuk segera: buka /api/deploy.php?kunci=... dalam pelayar."

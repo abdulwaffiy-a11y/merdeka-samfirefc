@@ -103,8 +103,8 @@ export function kiraUndur(tarikhIso, masaMula = '08:30') {
 export const LOGO = new URL('logo-samfire.png', document.baseURI).href
 
 export const HADIAH = [
-  { tempat: 'Juara',          tunai: 'RM1,000', lain: 'Medal + Piala', jenis: 'emas' },
-  { tempat: 'Naib Juara',     tunai: 'RM700',   lain: 'Medal + Piala', jenis: 'kelabu' },
-  { tempat: 'Tempat Ketiga',  tunai: 'RM500',   lain: 'Medal', jenis: 'maroon' },
-  { tempat: 'Tempat Keempat', tunai: 'RM300',   lain: 'Medal', jenis: 'kelabu' },
+  { tempat: 'Juara',          tunai: 'RM1,000', lain: 'Wang tunai + medal', jenis: 'emas' },
+  { tempat: 'Naib Juara',     tunai: 'RM700',   lain: 'Wang tunai + medal', jenis: 'kelabu' },
+  { tempat: 'Tempat Ketiga',  tunai: 'RM500',   lain: 'Wang tunai + medal', jenis: 'maroon' },
+  { tempat: 'Tempat Keempat', tunai: 'RM300',   lain: 'Wang tunai + medal', jenis: 'kelabu' },
 ]

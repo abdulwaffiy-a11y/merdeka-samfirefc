@@ -82,10 +82,11 @@ $data = [
         'pengumuman'       => $tetapan['pengumuman']       ?? '',
         'dikunci'          => ($tetapan['keputusan_dikunci'] ?? '0') === '1',
         'pendaftaran_buka' => ($tetapan['pendaftaran_buka'] ?? '0') === '1',
-        'yuran'            => $tetapan['yuran']            ?? 'RM150',
+        'yuran'            => $tetapan['yuran']            ?? 'RM200',
         'telefon_urusetia' => $tetapan['telefon_urusetia'] ?? '',
         'url_website'      => $tetapan['url_website']      ?? 'https://samfirefc.com',
         'url_daftar_ahli'  => $tetapan['url_daftar_ahli']  ?? 'https://samfirefc.com',
+        'poster'           => !empty($tetapan['poster']) ? 'api/uploads/' . $tetapan['poster'] : '',
     ],
     'ringkasan'  => [
         'jumlah_perlawanan' => $jumlah,

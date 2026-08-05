@@ -21,6 +21,21 @@
 
 declare(strict_types=1);
 
+/**
+ * MOD CRON (disyorkan)
+ * --------------------
+ * Hos ini ada perlindungan anti-bot yang menyekat panggilan dari GitHub.
+ * Jadi cara paling boleh diharap ialah biarkan SERVER menyemak sendiri
+ * mengikut jadual. Tetapkan Cron Job dalam cPanel:
+ *
+ *   *\/5 * * * * /usr/local/bin/php /home/adampowe/merdeka.samfirefc.com/api/deploy.php --cron
+ *
+ * Ia menyemak commit terkini di GitHub setiap 5 minit dan hanya menarik
+ * kod bila ada perubahan. Tiada kunci diperlukan (hanya server boleh
+ * jalankan baris arahan).
+ */
+$MOD_CRON = (PHP_SAPI === 'cli');
+
 require __DIR__ . '/lib/boot.php';
 
 const GH_OWNER  = 'abdulwaffiy-a11y';
@@ -35,10 +50,13 @@ const SALIN_FAIL = [
     'favicon.ico',
     'apple-touch-icon.png',
     'logo-samfire.png',
+    'og-image.jpg',
     'api/admins.php',
     'api/auth.php',
     'api/daftar.php',
     'api/draw.php',
+    'api/galeri.php',
+    'api/poster.php',
     'api/matches.php',
     'api/public.php',
     'api/teams.php',
@@ -134,19 +152,42 @@ if ($action === 'kunci') {
     ]);
 }
 
-// ---- Jalankan deploy -------------------------------------------------
-$kunci = (string)inp('kunci', '');
-if ($kunci === '' || !hash_equals(kunciDeploy(), $kunci)) {
-    audit(null, 'deploy_kunci_salah', []);
-    fail('Kunci deploy tidak sah.', 403);
+/** SHA commit terkini di GitHub (atau null jika gagal). */
+function shaTerkini(): ?string
+{
+    $info = muatTurun(sprintf('https://api.github.com/repos/%s/%s/commits/%s', GH_OWNER, GH_REPO, GH_BRANCH));
+    if (!$info) return null;
+    $j = json_decode($info, true);
+    return isset($j['sha']) ? (string)$j['sha'] : null;
 }
 
-// Had kekerapan: 1 deploy setiap 20 saat
-$penanda = sys_get_temp_dir() . '/merdeka_deploy_' . md5(docroot());
-if (file_exists($penanda) && (time() - (int)filemtime($penanda)) < 20) {
-    fail('Deploy baru sahaja dijalankan. Sila tunggu sebentar.', 429);
+// ---- Kebenaran -------------------------------------------------------
+if ($MOD_CRON) {
+    // Dijalankan oleh cron di server — tiada kunci diperlukan.
+    // Hanya tarik bila commit berubah, supaya tidak membazir sumber.
+    $paksa = in_array('--paksa', $argv ?? [], true);
+    $sha   = shaTerkini();
+    if ($sha === null) {
+        fwrite(STDERR, "deploy: tidak dapat menghubungi GitHub\n");
+        exit(1);
+    }
+    if (!$paksa && tetapan('deploy_sha', '') === $sha) {
+        echo "Tiada perubahan (" . substr($sha, 0, 7) . ").\n";
+        exit(0);
+    }
+} else {
+    $kunci = (string)inp('kunci', '');
+    if ($kunci === '' || !hash_equals(kunciDeploy(), $kunci)) {
+        audit(null, 'deploy_kunci_salah', []);
+        fail('Kunci deploy tidak sah.', 403);
+    }
+    // Had kekerapan: 1 deploy setiap 20 saat
+    $penanda = sys_get_temp_dir() . '/merdeka_deploy_' . md5(docroot());
+    if (file_exists($penanda) && (time() - (int)filemtime($penanda)) < 20) {
+        fail('Deploy baru sahaja dijalankan. Sila tunggu sebentar.', 429);
+    }
+    @touch($penanda);
 }
-@touch($penanda);
 
 $url = sprintf('https://codeload.github.com/%s/%s/zip/refs/heads/%s', GH_OWNER, GH_REPO, GH_BRANCH);
 $zipData = muatTurun($url);
@@ -206,17 +247,30 @@ foreach (SALIN_FOLDER as $folder) {
 
 buangFolder($tmpDir);
 
-// Baca commit terkini (maklumat sahaja)
+// Rekod commit yang baru di-deploy
 $commit = '';
 $info = muatTurun(sprintf('https://api.github.com/repos/%s/%s/commits/%s', GH_OWNER, GH_REPO, GH_BRANCH));
 if ($info) {
     $j = json_decode($info, true);
     if (isset($j['sha'])) {
+        setTetapan('deploy_sha', (string)$j['sha']);
+        setTetapan('deploy_pada', date('Y-m-d H:i:s'));
         $commit = substr((string)$j['sha'], 0, 7) . ' — ' . (string)($j['commit']['message'] ?? '');
     }
 }
 
-audit(null, 'deploy', ['fail' => count($disalin), 'gagal' => $gagal, 'commit' => $commit]);
+audit(null, 'deploy', [
+    'fail'   => count($disalin),
+    'gagal'  => $gagal,
+    'commit' => $commit,
+    'kaedah' => $MOD_CRON ? 'cron' : 'web',
+]);
+
+if ($MOD_CRON) {
+    echo count($disalin) . " fail dikemas kini. $commit\n";
+    if ($gagal) echo "Gagal: " . implode(', ', $gagal) . "\n";
+    exit(0);
+}
 
 ok([
     'mesej'   => count($disalin) . ' fail dikemas kini dari GitHub.',
