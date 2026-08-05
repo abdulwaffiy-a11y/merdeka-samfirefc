@@ -9,6 +9,22 @@ Options -Indexes
 # Halaman utama
 DirectoryIndex index.html
 
+# URL kemas — sembunyikan "/index.html" dan benarkan "/admin" tanpa ".html"
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # merdeka.samfirefc.com/index.html  ->  merdeka.samfirefc.com/
+    RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+    RewriteRule ^ / [R=301,L]
+
+    # merdeka.samfirefc.com/admin.html  ->  merdeka.samfirefc.com/admin
+    RewriteCond %{THE_REQUEST} \s/+admin\.html[\s?] [NC]
+    RewriteRule ^ /admin [R=301,L]
+
+    # /admin  ->  admin.html (dihidangkan tanpa ubah URL)
+    RewriteRule ^admin/?$ admin.html [L]
+</IfModule>
+
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"

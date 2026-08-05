@@ -22,6 +22,7 @@ export default function Ahli() {
   const [bukti, setBukti] = useState(null)
   const [sibuk, setSibuk] = useState(false)
   const [berjaya, setBerjaya] = useState('')
+  const [rujukan, setRujukan] = useState('')
   const refG = useRef(null)
   const refB = useRef(null)
 
@@ -56,6 +57,7 @@ export default function Ahli() {
       if (!d.ok) throw new Error(d.mesej || 'Pendaftaran gagal.')
 
       setBerjaya(d.mesej)
+      setRujukan(d.rujukan || '')
       setF({ nama: '', nama_panggilan: '', no_kp: '', tarikh_lahir: '', jantina: 'lelaki',
         telefon: '', emel: '', alamat: '', bandar: '', poskod: '', negeri: 'Pulau Pinang',
         posisi: '', no_jersi: '', pemain_idola: '' })
@@ -119,7 +121,14 @@ export default function Ahli() {
             <CheckCircle2 className="mx-auto size-10 text-emerald-600" />
             <p className="mt-2 text-sm font-bold">Permohonan diterima!</p>
             <p className="mx-auto mt-1 max-w-sm text-[13px] text-stone-600 dark:text-stone-400">{berjaya}</p>
-            <Button jenis="garis" className="mt-4" onClick={() => setBerjaya('')}>Daftar orang lain</Button>
+            {rujukan && (
+              <div className="mx-auto mt-3 w-fit rounded-lg border border-gold-500/40 bg-gold-500/10 px-4 py-2">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-stone-500">No. Rujukan</p>
+                <p className="tnum text-base font-black text-maroon-700 dark:text-maroon-300">{rujukan}</p>
+                <p className="mt-0.5 text-[11px] text-stone-500">Sebut nombor ini semasa membuat bayaran</p>
+              </div>
+            )}
+            <Button jenis="garis" className="mt-4" onClick={() => { setBerjaya(''); setRujukan('') }}>Daftar orang lain</Button>
           </CardBody>
         ) : !buka ? (
           <CardBody className="text-center text-sm text-stone-500">

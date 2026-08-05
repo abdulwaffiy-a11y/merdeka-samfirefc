@@ -193,10 +193,15 @@ if ($action === 'hantar') {
         $gambar ?? '', $bukti ?? '', $ip,
     ]);
 
+    $idBaru = (int)db()->lastInsertId();
     audit(null, 'ahli_hantar', ['nama' => $nama, 'gambar' => (bool)$gambar, 'bukti' => (bool)$bukti]);
 
-    ok(['mesej' => 'Permohonan keahlian diterima! Urus setia akan menghubungi anda untuk pengesahan bayaran '
-                 . $b['yuran'] . '.']);
+    ok([
+        'id'      => $idBaru,
+        'rujukan' => 'AHLI-' . str_pad((string)$idBaru, 4, '0', STR_PAD_LEFT),
+        'mesej'   => 'Permohonan keahlian diterima! Urus setia akan menghubungi anda untuk pengesahan bayaran '
+                   . $b['yuran'] . '.',
+    ]);
 }
 
 /* =================================================================== ADMIN */
