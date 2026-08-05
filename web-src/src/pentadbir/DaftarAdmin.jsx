@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ClipboardList, Check, X, Trash2, Phone, RefreshCw, Lock, Unlock, Pencil, UserPlus, Save, Users } from 'lucide-react'
+import { ClipboardList, Check, X, Trash2, Phone, RefreshCw, Lock, Unlock, Pencil, Shuffle, UserPlus, Save, Users } from 'lucide-react'
 import { Card, CardHeader, CardTitle, Button, Badge, Input, Label, Dialog, useToast } from '../ui'
 import { api } from '../lib/api'
 
@@ -126,6 +126,7 @@ export default function DaftarAdmin({ admin, muatSemula }) {
   const baru  = data.senarai.filter((s) => s.status === 'baru')
   const lulus = data.senarai.filter((s) => s.status === 'lulus')
   const tolak = data.senarai.filter((s) => s.status === 'tolak')
+  const menungguUndian = lulus.filter((s) => !s.team_id).length
 
   const Baris = ({ s }) => (
     <div className="px-4 py-3">
@@ -189,7 +190,9 @@ export default function DaftarAdmin({ admin, muatSemula }) {
       <div className="flex flex-wrap items-center gap-2">
         <Badge jenis="maroon">{baru.length} menunggu semakan</Badge>
         <Badge jenis="hijau">{lulus.length} lulus</Badge>
-        <Badge>{data.slot_kosong.length} slot kosong</Badge>
+        <Badge jenis={data.slot_kosong.length === 0 ? 'hijau' : 'kelabu'}>
+          {24 - data.slot_kosong.length}/24 slot kumpulan diisi
+        </Badge>
         <div className="ml-auto flex gap-2">
           <Button jenis="senyap" ukuran="sm" onClick={ambil}><RefreshCw className="size-4" /></Button>
           {data.buka
@@ -197,6 +200,17 @@ export default function DaftarAdmin({ admin, muatSemula }) {
             : <Button jenis="navy" ukuran="sm" onClick={() => buat(-1, () => api.daftarBuka(true), 'Pendaftaran DIBUKA.')}><Unlock className="size-3.5" />Buka pendaftaran</Button>}
         </div>
       </div>
+
+      {menungguUndian > 0 && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-gold-500/40 bg-gold-500/10 px-4 py-3">
+          <Shuffle className="mt-0.5 size-4 shrink-0 text-gold-600" />
+          <p className="text-[12.5px] leading-relaxed text-stone-700 dark:text-stone-300">
+            <strong>{menungguUndian} pasukan</strong> sudah diluluskan dan berada dalam <strong>kolam undian</strong>,
+            tetapi belum ada slot kumpulan. Slot A1–H3 hanya diisi selepas anda jalankan
+            <strong> Undian Kumpulan</strong> di tab <strong>Undian</strong> — sebab itu kiraan slot masih 0/24.
+          </p>
+        </div>
+      )}
 
       {[
         ['Menunggu Semakan', baru, 'Belum ada pendaftaran baharu.'],
