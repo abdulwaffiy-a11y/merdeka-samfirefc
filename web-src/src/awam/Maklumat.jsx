@@ -41,9 +41,17 @@ export default function Maklumat({ data }) {
               <Badge jenis={h.jenis}>{h.tunai}</Badge>
             </div>
           ))}
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">Semua Peserta</p>
+              <p className="text-[12px] text-stone-500">Sijil Penyertaan · dimuat turun dalam talian</p>
+            </div>
+            <Badge jenis="navy">Sijil</Badge>
+          </div>
         </div>
         <div className="border-t border-stone-200 px-4 py-2.5 text-[11px] text-stone-500 dark:border-stone-800">
           Jumlah wang tunai: <strong>RM2,500</strong> + medal. Tiada piala pusingan.
+          Setiap pemain berdaftar menerima <strong>Sijil Penyertaan</strong> bertandatangan penaja kejohanan.
         </div>
       </Card>
 
@@ -77,6 +85,12 @@ export default function Maklumat({ data }) {
             <li>Pasangan Suku Akhir ditentukan melalui <strong>cabutan undi</strong> di hadapan wakil pasukan.</li>
             <li>Peringkat kalah mati tidak boleh seri — sepakan penalti menentukan pemenang.</li>
             <li>Jumlah 32 perlawanan: 24 kumpulan + 4 suku akhir + 2 separuh akhir + 1 tempat ke-3 + 1 akhir.</li>
+            <li>
+              <strong>Bantahan keputusan:</strong> hendaklah dibuat secara <strong>bertulis</strong> oleh pengurus pasukan
+              sebelum perlawanan berikutnya bermula, disertakan deposit <strong>RM200</strong>.
+              Deposit dikembalikan sekiranya bantahan berjaya. Keputusan Jawatankuasa Bantahan adalah <strong>muktamad</strong>.
+            </li>
+            <li>Setiap pemain berdaftar menerima <strong>Sijil Penyertaan</strong> — dimuat turun melalui pautan yang diberikan kepada pengurus pasukan.</li>
             <li>Utamakan solat · jaga adab, disiplin &amp; sportsmanship — <em>"Sukan dan Solat asas kejayaan dunia &amp; akhirat"</em>.</li>
           </ul>
 

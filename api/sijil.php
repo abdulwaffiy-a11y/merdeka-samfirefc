@@ -233,59 +233,104 @@ body { margin: 0; background: #e7e5e4; font-family: Georgia, "Times New Roman", 
 
 .sijil {
   position: relative; width: 297mm; height: 210mm; margin: 8mm auto;
-  background: #fffdf8; overflow: hidden; page-break-after: always;
+  background: #fffdf7; overflow: hidden; page-break-after: always;
   box-shadow: 0 2px 14px rgba(0,0,0,.14);
 }
 .sijil:last-child { page-break-after: auto; }
 
-/* bingkai */
-.sijil::before {
-  content: ''; position: absolute; inset: 7mm; border: 2.2mm solid #7B1E2B; border-radius: 3mm;
+/* ---------- latar & bingkai ---------- */
+.kanvas { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 120mm 70mm at 50% -12mm, rgba(201,162,39,.13), transparent 70%),
+    radial-gradient(ellipse 150mm 80mm at 50% 118%, rgba(19,34,68,.09), transparent 72%),
+    linear-gradient(#fffdf7, #fffaf0);
 }
-.sijil::after {
-  content: ''; position: absolute; inset: 10.5mm; border: 0.6mm solid #C9A227; border-radius: 2mm;
-}
-.hiasA, .hiasB { position: absolute; border-radius: 50%; pointer-events: none; }
-.hiasA { width: 120mm; height: 120mm; right: -45mm; top: -55mm; background: radial-gradient(circle, rgba(201,162,39,.22), transparent 68%); }
-.hiasB { width: 110mm; height: 110mm; left: -42mm; bottom: -48mm; background: radial-gradient(circle, rgba(19,34,68,.14), transparent 68%); }
+/* jalur halus tepi kiri — motif Jalur Gemilang */
+.jalur { position: absolute; left: 0; top: 0; bottom: 0; width: 9mm;
+  background: repeating-linear-gradient(180deg,
+    #7B1E2B 0 7mm, #fffdf7 7mm 14mm); opacity: .9; }
+.jalur::after { content: ''; position: absolute; left: 0; top: 0; width: 9mm; height: 56mm;
+  background: #132244; }
+.bintang { position: absolute; left: 1.6mm; top: 20mm; width: 5.8mm; height: 5.8mm; }
 
-.isi { position: relative; z-index: 2; height: 100%; padding: 20mm 24mm 16mm; text-align: center;
-       display: flex; flex-direction: column; }
+.bingkaiLuar { position: absolute; inset: 6mm 6mm 6mm 12mm; border: 1.4mm solid #7B1E2B; border-radius: 2mm; }
+.bingkaiDalam { position: absolute; inset: 8.6mm 8.6mm 8.6mm 14.6mm; border: 0.45mm solid #C9A227; border-radius: 1.4mm; }
 
-.logo { height: 24mm; margin: 0 auto 3mm; display: block; }
-.penganjur { font-size: 3.3mm; letter-spacing: .32em; text-transform: uppercase; color: #7B1E2B; font-weight: 700; }
-.tajukKej { font-size: 6.2mm; letter-spacing: .05em; color: #132244; margin: 2.5mm 0 1mm; font-weight: 700; }
-.tarikhKej { font-size: 3.6mm; color: #78716c; font-style: italic; }
+/* sudut hiasan */
+.sudut { position: absolute; width: 16mm; height: 16mm; border: 0.7mm solid #C9A227; }
+.sudut.tl { top: 11mm; left: 17mm; border-right: 0; border-bottom: 0; border-top-left-radius: 3mm; }
+.sudut.tr { top: 11mm; right: 11mm; border-left: 0; border-bottom: 0; border-top-right-radius: 3mm; }
+.sudut.bl { bottom: 11mm; left: 17mm; border-right: 0; border-top: 0; border-bottom-left-radius: 3mm; }
+.sudut.br { bottom: 11mm; right: 11mm; border-left: 0; border-top: 0; border-bottom-right-radius: 3mm; }
 
-.garis { width: 42mm; height: 0.8mm; background: #C9A227; margin: 5mm auto; border-radius: 1mm; }
+/* tera air lencana */
+.tera { position: absolute; left: 50%; top: 52%; transform: translate(-50%,-50%);
+  width: 118mm; opacity: .052; }
 
-.jenisSijil { font-size: 4.6mm; letter-spacing: .3em; text-transform: uppercase; color: #7B1E2B; font-weight: 700; }
-.diberi { font-size: 3.6mm; color: #57534e; margin-top: 4mm; }
+/* ---------- kandungan ---------- */
+.isi { position: relative; z-index: 3; height: 100%; padding: 15mm 22mm 13mm 28mm;
+       text-align: center; display: flex; flex-direction: column; }
 
-.namaPenerima {
-  font-size: 13mm; line-height: 1.12; color: #132244; font-weight: 700;
-  margin: 3mm auto 2mm; max-width: 235mm; word-break: break-word;
-}
-.namaPenerima.kecil { font-size: 9.5mm; }
-.namaPenerima.sangatKecil { font-size: 7.5mm; }
+.pitaMerdeka { display: inline-block; margin: 0 auto; padding: 1.4mm 8mm 1.4mm 8mm;
+  background: linear-gradient(90deg, #7B1E2B, #a02a3c 55%, #7B1E2B); color: #ffe9a8;
+  font-size: 3.1mm; letter-spacing: .42em; text-transform: uppercase; font-weight: 700;
+  border-radius: 1mm; box-shadow: 0 .6mm 0 rgba(0,0,0,.12); font-family: Arial, Helvetica, sans-serif; }
 
-.subNama { font-size: 4.2mm; color: #57534e; }
+.kepala { display: flex; align-items: center; justify-content: center; gap: 6mm; margin-top: 3.5mm; }
+.logo { height: 21mm; display: block; }
+.kepalaTeks { text-align: left; }
+.penganjur { font-size: 2.9mm; letter-spacing: .26em; text-transform: uppercase; color: #7B1E2B;
+  font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+.tajukKej { font-size: 5.6mm; letter-spacing: .02em; color: #132244; margin-top: 1mm; font-weight: 700; line-height: 1.15; }
+.tarikhKej { font-size: 3.2mm; color: #78716c; font-style: italic; margin-top: .8mm; }
+
+.pembahagi { display: flex; align-items: center; justify-content: center; gap: 2.5mm; margin: 5mm auto 0; width: 70mm; }
+.pembahagi i { flex: 1; height: 0.5mm; background: linear-gradient(90deg, transparent, #C9A227); }
+.pembahagi i:last-child { background: linear-gradient(90deg, #C9A227, transparent); }
+.pembahagi b { width: 2.6mm; height: 2.6mm; background: #C9A227; transform: rotate(45deg); }
+
+.jenisSijil { font-size: 4.4mm; letter-spacing: .38em; text-transform: uppercase; color: #7B1E2B;
+  font-weight: 700; margin-top: 4mm; font-family: Arial, Helvetica, sans-serif; }
+.diberi { font-size: 3.3mm; color: #78716c; margin-top: 3mm; font-style: italic; }
+
+.namaPenerima { font-size: 13mm; line-height: 1.1; color: #132244; font-weight: 700;
+  margin: 1.5mm auto 0; max-width: 225mm; word-break: break-word; }
+.namaPenerima.kecil { font-size: 10mm; }
+.namaPenerima.sangatKecil { font-size: 7.6mm; }
+.garisNama { width: 120mm; height: 0.4mm; background: linear-gradient(90deg, transparent, #d6d3d1 20%, #d6d3d1 80%, transparent); margin: 2mm auto 0; }
+
+.subNama { font-size: 3.9mm; color: #57534e; margin-top: 2.5mm; }
 .subNama strong { color: #7B1E2B; }
 
-.pencapaian {
-  display: inline-block; margin-top: 3mm; padding: 1.8mm 7mm; border: 0.6mm solid #C9A227;
-  border-radius: 2mm; background: rgba(201,162,39,.12);
-  font-size: 4.4mm; letter-spacing: .22em; font-weight: 700; color: #a9861d;
-}
+.pencapaian { display: inline-block; margin-top: 3mm; padding: 1.6mm 7mm;
+  border: 0.5mm solid #C9A227; border-radius: 1.4mm;
+  background: linear-gradient(#fdf6e0, #f7ecc9);
+  font-size: 4mm; letter-spacing: .24em; font-weight: 700; color: #8a6c15;
+  font-family: Arial, Helvetica, sans-serif; }
 
-.kaki { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 10mm; }
-.kakiKiri { text-align: left; font-size: 3.2mm; color: #78716c; line-height: 1.5; max-width: 85mm; }
-.ttdBlok { text-align: center; min-width: 72mm; }
-.ttdImej { height: 17mm; display: block; margin: 0 auto 1mm; }
-.ttdKosong { height: 17mm; }
-.ttdGaris { border-top: 0.4mm solid #44403c; width: 72mm; margin: 0 auto 1.6mm; }
-.ttdNama { font-size: 3.8mm; font-weight: 700; color: #132244; }
-.ttdJawatan { font-size: 3.2mm; color: #78716c; margin-top: .6mm; }
+/* jalur maklumat */
+.jalurInfo { margin: auto auto 0; display: flex; gap: 0; align-items: stretch;
+  border: 0.4mm solid #eadfc4; border-radius: 1.4mm; overflow: hidden; background: #fffcf2; }
+.jalurInfo div { padding: 2mm 7mm; text-align: center; border-left: 0.4mm solid #eadfc4; }
+.jalurInfo div:first-child { border-left: 0; }
+.jalurInfo span { display: block; font-size: 2.5mm; letter-spacing: .2em; text-transform: uppercase;
+  color: #a8a29e; font-family: Arial, Helvetica, sans-serif; }
+.jalurInfo strong { display: block; font-size: 3.3mm; color: #44403c; margin-top: .6mm; }
+
+.kaki { margin-top: 6mm; display: flex; align-items: flex-end; justify-content: space-between; gap: 8mm; }
+.kakiKiri { text-align: left; font-size: 2.8mm; color: #a8a29e; line-height: 1.55; max-width: 78mm;
+  font-family: Arial, Helvetica, sans-serif; }
+.kakiKiri b { color: #78716c; letter-spacing: .06em; }
+.ttdBlok { text-align: center; min-width: 70mm; }
+.ttdImej { height: 15mm; display: block; margin: 0 auto .5mm; }
+.ttdKosong { height: 15mm; }
+.ttdGaris { border-top: 0.4mm solid #57534e; width: 70mm; margin: 0 auto 1.4mm; }
+.ttdNama { font-size: 3.6mm; font-weight: 700; color: #132244; }
+.ttdJawatan { font-size: 2.9mm; color: #78716c; margin-top: .5mm; }
+
+/* jalur bawah */
+.jalurBawah { position: absolute; left: 12mm; right: 6mm; bottom: 6mm; height: 1.6mm; z-index: 4;
+  background: linear-gradient(90deg, #132244 0 18%, #7B1E2B 18% 46%, #C9A227 46% 54%, #7B1E2B 54% 82%, #132244 82% 100%); }
 
 /* Bar kawalan — tidak dicetak */
 .bar { position: sticky; top: 0; z-index: 20; background: #132244; color: #fff; padding: 12px 16px;
@@ -296,7 +341,7 @@ body { margin: 0; background: #e7e5e4; font-family: Georgia, "Times New Roman", 
        font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; }
 .btn.putih { background: rgba(255,255,255,.14); color: #fff; }
 @media print { .bar { display: none !important; } body { background: #fff; }
-  .sijil { margin: 0; box-shadow: none; width: 100%; height: 100vh; } }
+  .sijil { margin: 0; box-shadow: none; } }
 CSS;
 }
 
@@ -310,28 +355,57 @@ function kelasNama(string $nama): string
 
 /** Satu sijil. */
 function kadSijil(string $jenis, string $namaPenerima, string $sub, string $pencapaian,
-                  array $konteks): string
+                  array $konteks, array $info = [], string $siri = ''): string
 {
     $logo = '../logo-samfire.png';
     $ttd  = $konteks['ttdFail'] !== '' ? 'uploads/' . $konteks['ttdFail'] : '';
 
-    $h  = '<div class="sijil"><div class="hiasA"></div><div class="hiasB"></div><div class="isi">';
+    $bintang = '<svg class="bintang" viewBox="0 0 24 24" fill="#C9A227">'
+             . '<path d="M12 1.6l2.9 6.4 6.9.7-5.2 4.7 1.5 6.9L12 16.9 5.9 20.3l1.5-6.9L2.2 8.7l6.9-.7z"/></svg>';
+
+    $h  = '<div class="sijil">';
+    $h .= '<div class="kanvas"></div>';
+    $h .= '<div class="jalur"></div>' . $bintang;
+    $h .= '<img class="tera" src="' . $logo . '" alt="">';
+    $h .= '<div class="bingkaiLuar"></div><div class="bingkaiDalam"></div>';
+    $h .= '<div class="sudut tl"></div><div class="sudut tr"></div><div class="sudut bl"></div><div class="sudut br"></div>';
+    $h .= '<div class="jalurBawah"></div>';
+
+    $h .= '<div class="isi">';
+    $h .= '<div><span class="pitaMerdeka">Merdeka ' . e($konteks['tahun']) . '</span></div>';
+
+    $h .= '<div class="kepala">';
     $h .= '<img class="logo" src="' . $logo . '" alt="SAMFIRE FC">';
+    $h .= '<div class="kepalaTeks">';
     $h .= '<div class="penganjur">Anjuran SAMFIRE FC &middot; Kerjasama PAKSY</div>';
     $h .= '<div class="tajukKej">' . e($konteks['namaKej']) . '</div>';
     $h .= '<div class="tarikhKej">' . e($konteks['tarikhTeks']);
     if ($konteks['lokasi'] !== '') $h .= ' &middot; ' . e($konteks['lokasi']);
-    $h .= '</div>';
-    $h .= '<div class="garis"></div>';
+    $h .= '</div></div></div>';
+
+    $h .= '<div class="pembahagi"><i></i><b></b><i></i></div>';
     $h .= '<div class="jenisSijil">' . e($jenis) . '</div>';
     $h .= '<div class="diberi">Dengan ini disahkan bahawa</div>';
     $h .= '<div class="' . kelasNama($namaPenerima) . '">' . e($namaPenerima) . '</div>';
+    $h .= '<div class="garisNama"></div>';
     $h .= '<div class="subNama">' . $sub . '</div>';
     if ($pencapaian !== '') {
         $h .= '<div><span class="pencapaian">' . e($pencapaian) . '</span></div>';
     }
+
+    if ($info) {
+        $h .= '<div class="jalurInfo">';
+        foreach ($info as $label => $nilai) {
+            $h .= '<div><span>' . e((string)$label) . '</span><strong>' . e((string)$nilai) . '</strong></div>';
+        }
+        $h .= '</div>';
+    }
+
     $h .= '<div class="kaki">';
-    $h .= '<div class="kakiKiri">Sijil ini dikeluarkan oleh urus setia<br>Kejohanan Futsal Merdeka Kepala Batas 2026<br>merdeka.samfirefc.com</div>';
+    $h .= '<div class="kakiKiri">';
+    if ($siri !== '') $h .= '<b>No. Sijil</b> ' . e($siri) . '<br>';
+    $h .= 'Dikeluarkan oleh urus setia kejohanan<br>merdeka.samfirefc.com';
+    $h .= '</div>';
     $h .= '<div class="ttdBlok">';
     $h .= $ttd !== '' ? '<img class="ttdImej" src="' . e($ttd) . '" alt="">' : '<div class="ttdKosong"></div>';
     $h .= '<div class="ttdGaris"></div>';
@@ -342,10 +416,13 @@ function kadSijil(string $jenis, string $namaPenerima, string $sub, string $penc
     return $h;
 }
 
+$tahunKej = count($tp) === 3 ? $tp[0] : date('Y');
 $konteks = [
     'namaKej' => $namaKej, 'tarikhTeks' => $tarikhTeks, 'lokasi' => $lokasi,
     'ttdFail' => $ttdFail, 'ttdNama' => $ttdNama, 'ttdJawatan' => $ttdJawatan,
+    'tahun'   => $tahunKej,
 ];
+$siriAsas = 'MKB' . $tahunKej . '/' . $pasukan['kumpulan'] . $pasukan['slot'];
 
 /* ------------------------------------------------------- mod cetak */
 if ($cetak !== '') {
@@ -354,9 +431,11 @@ if ($cetak !== '') {
 
     if ($cetak === 'pasukan') {
         $tajukHalaman = 'Sijil Penyertaan Pasukan — ' . $pasukan['nama'];
-        $kad = kadSijil('Sijil Penyertaan', $pasukan['nama'],
-            'Telah menyertai kejohanan ini sebagai pasukan peserta<br>Kumpulan <strong>' . e($pasukan['kumpulan']) . '</strong>',
-            $pencapaian, $konteks);
+        $kad = kadSijil('Sijil Penyertaan Pasukan', $pasukan['nama'],
+            'Telah menyertai kejohanan ini sebagai pasukan peserta',
+            $pencapaian, $konteks,
+            ['Kumpulan' => $pasukan['kumpulan'], 'Bilangan Pemain' => (string)count($pemain), 'Kategori' => 'Terbuka'],
+            $siriAsas . '/P');
 
     } elseif ($cetak === 'pemain') {
         $idP = (int)inp('id', 0);
@@ -365,20 +444,26 @@ if ($cetak !== '') {
         if (!$jumpa) { http_response_code(404); echo 'Pemain tidak dijumpai.'; exit; }
         $tajukHalaman = 'Sijil — ' . $jumpa['nama'];
         $kad = kadSijil('Sijil Penyertaan', $jumpa['nama'],
-            'Pemain bagi pasukan <strong>' . e($pasukan['nama']) . '</strong>'
-            . ($jumpa['no_jersi'] !== '' ? ' &middot; No. jersi ' . e($jumpa['no_jersi']) : ''),
-            $pencapaian, $konteks);
+            'Pemain bagi pasukan <strong>' . e($pasukan['nama']) . '</strong>',
+            $pencapaian, $konteks,
+            ['Pasukan' => $pasukan['nama'], 'Kumpulan' => $pasukan['kumpulan'],
+             'No. Jersi' => $jumpa['no_jersi'] !== '' ? $jumpa['no_jersi'] : '—'],
+            $siriAsas . '/' . str_pad((string)$jumpa['id'], 3, '0', STR_PAD_LEFT));
 
     } else { // semua
         $tajukHalaman = 'Semua Sijil — ' . $pasukan['nama'];
-        $kad = kadSijil('Sijil Penyertaan', $pasukan['nama'],
-            'Telah menyertai kejohanan ini sebagai pasukan peserta<br>Kumpulan <strong>' . e($pasukan['kumpulan']) . '</strong>',
-            $pencapaian, $konteks);
+        $kad = kadSijil('Sijil Penyertaan Pasukan', $pasukan['nama'],
+            'Telah menyertai kejohanan ini sebagai pasukan peserta',
+            $pencapaian, $konteks,
+            ['Kumpulan' => $pasukan['kumpulan'], 'Bilangan Pemain' => (string)count($pemain), 'Kategori' => 'Terbuka'],
+            $siriAsas . '/P');
         foreach ($pemain as $p) {
             $kad .= kadSijil('Sijil Penyertaan', $p['nama'],
-                'Pemain bagi pasukan <strong>' . e($pasukan['nama']) . '</strong>'
-                . ($p['no_jersi'] !== '' ? ' &middot; No. jersi ' . e($p['no_jersi']) : ''),
-                $pencapaian, $konteks);
+                'Pemain bagi pasukan <strong>' . e($pasukan['nama']) . '</strong>',
+                $pencapaian, $konteks,
+                ['Pasukan' => $pasukan['nama'], 'Kumpulan' => $pasukan['kumpulan'],
+                 'No. Jersi' => $p['no_jersi'] !== '' ? $p['no_jersi'] : '—'],
+                $siriAsas . '/' . str_pad((string)$p['id'], 3, '0', STR_PAD_LEFT));
         }
     }
 

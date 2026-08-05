@@ -234,6 +234,8 @@ export default function Beranda({ data, keTab }) {
             'Johan kumpulan sahaja mara ke Suku Akhir',
             'Kalah mati seri → sepakan penalti',
             'Wajib menutup aurat sepanjang pertandingan',
+            'Bantahan keputusan: bertulis oleh pengurus + deposit RM200',
+            'Semua pemain berdaftar menerima Sijil Penyertaan',
             'Utamakan solat · jaga adab, disiplin & sportsmanship',
           ].map((p) => (
             <div key={p} className="flex gap-2">
