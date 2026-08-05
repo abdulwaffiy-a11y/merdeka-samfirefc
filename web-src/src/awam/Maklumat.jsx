@@ -1,4 +1,4 @@
-import { Trophy, Clock, Info } from 'lucide-react'
+import { Trophy, Clock, Info, Globe, Shield } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Badge } from '../ui'
 import { HADIAH } from '../lib/util'
 
@@ -116,6 +116,20 @@ export default function Maklumat({ data }) {
             <p>{data.tetapan.lokasi}</p>
             {data.tetapan.telefon_urusetia && <p>Urus setia: {data.tetapan.telefon_urusetia}</p>}
           </div>
+
+          <div className="grid gap-2 border-t border-stone-100 pt-3 sm:grid-cols-2 dark:border-stone-800">
+            <a href={data.tetapan.url_website} target="_blank" rel="noreferrer"
+               className="flex items-center justify-center gap-2 rounded-xl bg-navy-800 px-4 py-3 text-[13px] font-bold text-white transition hover:bg-navy-900">
+              <Globe className="size-4" />Laman Web SAMFIRE FC
+            </a>
+            <a href={data.tetapan.url_daftar_ahli} target="_blank" rel="noreferrer"
+               className="flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-4 py-3 text-[13px] font-bold text-navy-900 transition hover:bg-gold-600">
+              <Shield className="size-4" />Daftar Ahli SAMFIRE FC
+            </a>
+          </div>
+          <p className="text-[11px] text-stone-400">
+            Nota: &quot;Daftar Ahli&quot; adalah keahlian kelab SAMFIRE FC — berbeza daripada pendaftaran pasukan kejohanan di tab Daftar.
+          </p>
         </CardBody>
       </Card>
     </div>

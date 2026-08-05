@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { UserPlus, Globe, Users, Trash2, Upload, CheckCircle2, Shield, Loader2 } from 'lucide-react'
+import { UserPlus, Users, Trash2, Upload, CheckCircle2, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Badge, useToast } from '../ui'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
@@ -74,18 +74,6 @@ export default function Daftar({ data }) {
 
   return (
     <div className="space-y-4">
-      {/* ---- Butang SAMFIRE ---- */}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <a href={t.url_website} target="_blank" rel="noreferrer"
-           className="flex items-center justify-center gap-2 rounded-xl bg-navy-800 px-4 py-3.5 text-sm font-bold text-white transition hover:bg-navy-900">
-          <Globe className="size-4" />Laman Web SAMFIRE FC
-        </a>
-        <a href={t.url_daftar_ahli} target="_blank" rel="noreferrer"
-           className="flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-4 py-3.5 text-sm font-bold text-navy-900 transition hover:bg-gold-600">
-          <Shield className="size-4" />Daftar Ahli SAMFIRE FC
-        </a>
-      </div>
-
       {/* ---- Status ---- */}
       {info && (
         <div className="grid grid-cols-3 gap-3">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Trophy, MapPin, CalendarDays, Radio, Clock } from 'lucide-react'
+import { Trophy, MapPin, CalendarDays, Radio, Clock, UserPlus } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Badge, BadgeLive, Kosong } from '../ui'
 import Galeri from './Galeri'
 import { petaPasukan, namaSisi, teksSkor, masaMy, tarikhMy, kiraUndur, PERINGKAT_PENDEK, kodPapar, pemenangId, LOGO } from '../lib/util'
@@ -80,6 +80,15 @@ export default function Beranda({ data, keTab }) {
             <p className="flex items-start gap-2"><MapPin className="mt-0.5 size-3.5 shrink-0" /><span>{t.lokasi}</span></p>
           </div>
           <div className="mt-4"><KotakUndur tarikh={t.tarikh_kejohanan} masaMula={t.masa_mula} /></div>
+
+          {t.pendaftaran_buka && (
+            <button
+              onClick={() => keTab('daftar')}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 px-4 py-3.5 text-sm font-black uppercase tracking-wide text-navy-900 shadow-lg transition hover:bg-gold-400 active:scale-[.99] sm:w-auto sm:px-8"
+            >
+              <UserPlus className="size-4" />Daftar Pasukan Sekarang
+            </button>
+          )}
         </div>
       </div>
 
