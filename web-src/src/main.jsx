@@ -139,7 +139,7 @@ function App() {
           <p className="mt-1 text-[11px] text-stone-400">
             Sistem dibangunkan oleh{' '}
             <a
-              href="https://waffiymarketingexpert.com/"
+              href="https://k1.waffiymarketingexpert.com/tawaran"
               target="_blank"
               rel="noopener noreferrer"
               className="font-bold text-maroon-700 underline-offset-2 hover:underline dark:text-maroon-300"

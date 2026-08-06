@@ -594,7 +594,7 @@ $asas = urlAsas();
   <p style="text-align:center;font-size:11px;color:#a8a29e;margin:18px 0 0;line-height:1.7">
     &copy; <?= date('Y') ?> SAMFIRE FC &middot; Kejohanan Futsal Merdeka Kepala Batas<br>
     Sistem dibangunkan oleh
-    <a href="https://waffiymarketingexpert.com/" target="_blank" rel="noopener noreferrer"
+    <a href="https://k1.waffiymarketingexpert.com/tawaran" target="_blank" rel="noopener noreferrer"
        style="color:#7B1E2B;font-weight:700;text-decoration:none">Waffiy Marketing Expert</a>
   </p>
 

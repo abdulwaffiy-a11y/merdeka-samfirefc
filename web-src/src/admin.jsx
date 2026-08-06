@@ -165,7 +165,7 @@ function Panel({ admin, keluar }) {
 
       <footer className="mx-auto max-w-5xl px-4 pb-4 text-center text-[11px] text-stone-400">
         &copy; {new Date().getFullYear()} SAMFIRE FC · Sistem dibangunkan oleh{' '}
-        <a href="https://waffiymarketingexpert.com/" target="_blank" rel="noopener noreferrer"
+        <a href="https://k1.waffiymarketingexpert.com/tawaran" target="_blank" rel="noopener noreferrer"
            className="font-bold text-maroon-700 underline-offset-2 hover:underline dark:text-maroon-300">
           Waffiy Marketing Expert
         </a>
