@@ -126,9 +126,28 @@ function App() {
 
       <main className="mx-auto max-w-5xl p-4">{Kandungan}</main>
 
-      <footer className="mx-auto max-w-5xl px-4 pb-4 text-center text-[11px] text-stone-400">
-        Keputusan dikemas kini automatik setiap 10 saat
-        {segarPada && <> · terakhir {segarPada.toLocaleTimeString('ms-MY')}</>}
+      <footer className="mx-auto max-w-5xl px-4 pb-5 text-center text-[11px] text-stone-400">
+        <p>
+          Keputusan dikemas kini automatik setiap 10 saat
+          {segarPada && <> · terakhir {segarPada.toLocaleTimeString('ms-MY')}</>}
+        </p>
+
+        <div className="mx-auto mt-3 max-w-md border-t border-stone-200 pt-3 dark:border-stone-800">
+          <p className="text-[11px] text-stone-500 dark:text-stone-400">
+            &copy; {new Date().getFullYear()} SAMFIRE FC · Kejohanan Futsal Merdeka Kepala Batas
+          </p>
+          <p className="mt-1 text-[11px] text-stone-400">
+            Sistem dibangunkan oleh{' '}
+            <a
+              href="https://waffiymarketingexpert.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-maroon-700 underline-offset-2 hover:underline dark:text-maroon-300"
+            >
+              Waffiy Marketing Expert
+            </a>
+          </p>
+        </div>
       </footer>
 
       {/* ---- Navigasi bawah (telefon) ---- */}

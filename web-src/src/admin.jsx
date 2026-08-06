@@ -163,6 +163,14 @@ function Panel({ admin, keluar }) {
 
       <main className="mx-auto max-w-5xl p-4">{Kandungan}</main>
 
+      <footer className="mx-auto max-w-5xl px-4 pb-4 text-center text-[11px] text-stone-400">
+        &copy; {new Date().getFullYear()} SAMFIRE FC · Sistem dibangunkan oleh{' '}
+        <a href="https://waffiymarketingexpert.com/" target="_blank" rel="noopener noreferrer"
+           className="font-bold text-maroon-700 underline-offset-2 hover:underline dark:text-maroon-300">
+          Waffiy Marketing Expert
+        </a>
+      </footer>
+
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 backdrop-blur-md md:hidden dark:border-stone-800 dark:bg-stone-950/95"
            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="grid grid-cols-7">
