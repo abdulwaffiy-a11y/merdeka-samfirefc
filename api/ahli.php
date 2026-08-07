@@ -170,10 +170,11 @@ if ($action === 'hantar') {
     if ($lahir !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $lahir)) $lahir = '';
     if ($jersi !== '' && (int)$jersi > 99) $jersi = '';
 
-    $st = db()->prepare('SELECT status FROM ahli WHERE no_kp = ?');
+    $st = db()->prepare('SELECT id, status FROM ahli WHERE no_kp = ?');
     $st->execute([$kp]);
-    if ($ada = $st->fetch()) {
-        fail($ada['status'] === 'lulus'
+    $sedia = $st->fetch();
+    if ($sedia && $sedia['status'] !== 'tolak') {
+        fail($sedia['status'] === 'lulus'
             ? 'No. kad pengenalan ini sudah berdaftar sebagai ahli.'
             : 'No. kad pengenalan ini sudah menghantar borang. Sila tunggu pengesahan urus setia.');
     }
@@ -181,19 +182,34 @@ if ($action === 'hantar') {
     $gambar = !empty($_FILES['gambar']) ? simpanImejAhli($_FILES['gambar'], 'ahli', 800) : null;
     $bukti  = !empty($_FILES['bukti'])  ? simpanImejAhli($_FILES['bukti'], 'bayar', 1200) : null;
 
-    $st = db()->prepare(
-        'INSERT INTO ahli (nama, nama_panggilan, no_kp, tarikh_lahir, jantina, telefon, emel,
-                           alamat, bandar, negeri, poskod, posisi, no_jersi, pemain_idola,
-                           gambar, bukti_bayar, ip)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-    );
-    $st->execute([
-        $nama, $panggilan, $kp, $lahir !== '' ? $lahir : null, $jantina, $telefon, $emel,
-        $alamat, $bandar, $negeri, $poskod, $posisi, $jersi, $idola,
-        $gambar ?? '', $bukti ?? '', $ip,
-    ]);
-
-    $idBaru = (int)db()->lastInsertId();
+    if ($sedia) {
+        // Permohonan lalu DITOLAK — benarkan hantar semula (ganti rekod lama).
+        db()->prepare(
+            "UPDATE ahli SET nama = ?, nama_panggilan = ?, tarikh_lahir = ?, jantina = ?, telefon = ?,
+                             emel = ?, alamat = ?, bandar = ?, negeri = ?, poskod = ?, posisi = ?,
+                             no_jersi = ?, pemain_idola = ?, gambar = ?, bukti_bayar = ?, ip = ?,
+                             status = 'baru', catatan = '', created_at = NOW()
+               WHERE id = ?"
+        )->execute([
+            $nama, $panggilan, $lahir !== '' ? $lahir : null, $jantina, $telefon, $emel,
+            $alamat, $bandar, $negeri, $poskod, $posisi, $jersi, $idola,
+            $gambar ?? '', $bukti ?? '', $ip, (int)$sedia['id'],
+        ]);
+        $idBaru = (int)$sedia['id'];
+    } else {
+        $st = db()->prepare(
+            'INSERT INTO ahli (nama, nama_panggilan, no_kp, tarikh_lahir, jantina, telefon, emel,
+                               alamat, bandar, negeri, poskod, posisi, no_jersi, pemain_idola,
+                               gambar, bukti_bayar, ip)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        );
+        $st->execute([
+            $nama, $panggilan, $kp, $lahir !== '' ? $lahir : null, $jantina, $telefon, $emel,
+            $alamat, $bandar, $negeri, $poskod, $posisi, $jersi, $idola,
+            $gambar ?? '', $bukti ?? '', $ip,
+        ]);
+        $idBaru = (int)db()->lastInsertId();
+    }
     audit(null, 'ahli_hantar', ['nama' => $nama, 'gambar' => (bool)$gambar, 'bukti' => (bool)$bukti]);
 
     ok([
@@ -224,13 +240,27 @@ if ($action === 'lulus' || $action === 'tolak') {
     $admin = wajibAdmin();
     pastikanJadualAhli();
     $id = (int)inp('id', 0);
-    $catatan = mb_substr(trim((string)inp('catatan', '')), 0, 200);
+
+    // Semak kewujudan DAHULU — rowCount() pulangkan 0 juga bila nilai tidak berubah
+    // (cth. admin tekan "Sah" dua kali), jadi jangan guna ia untuk kesan rekod hilang.
+    $st = db()->prepare('SELECT id, status FROM ahli WHERE id = ?');
+    $st->execute([$id]);
+    $ada = $st->fetch();
+    if (!$ada) fail('Rekod tidak dijumpai.', 404);
+
     $baru = $action === 'lulus' ? 'lulus' : 'tolak';
-    $st = db()->prepare('UPDATE ahli SET status = ?, catatan = ? WHERE id = ?');
-    $st->execute([$baru, $catatan, $id]);
-    if ($st->rowCount() === 0) fail('Rekod tidak dijumpai.', 404);
-    audit($admin, 'ahli_' . $baru, ['id' => $id]);
-    ok();
+    $catatanMasuk = inp('catatan', null);
+
+    if ($catatanMasuk === null) {
+        // Jangan padam catatan sedia ada bila admin tidak menghantar catatan baharu
+        db()->prepare('UPDATE ahli SET status = ? WHERE id = ?')->execute([$baru, $id]);
+    } else {
+        db()->prepare('UPDATE ahli SET status = ?, catatan = ? WHERE id = ?')
+            ->execute([$baru, mb_substr(trim((string)$catatanMasuk), 0, 200), $id]);
+    }
+
+    audit($admin, 'ahli_' . $baru, ['id' => $id, 'dari' => $ada['status']]);
+    ok(['status' => $baru]);
 }
 
 if ($action === 'padam') {

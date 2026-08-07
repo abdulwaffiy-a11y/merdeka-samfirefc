@@ -51,7 +51,7 @@ function DialogSunting({ rekod, tutup, selepas }) {
 
         <div className="border-t border-stone-100 pt-3 dark:border-stone-800">
           <p className="mb-2 flex items-center gap-2 text-[12px] font-semibold text-stone-600 dark:text-stone-400">
-            <Users className="size-3.5" />Senarai pemain ({pemain.length}/20)
+            <Users className="size-3.5" />Senarai pemain ({pemain.length}/10)
           </p>
           <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
             {pemain.length === 0 && (
@@ -62,7 +62,7 @@ function DialogSunting({ rekod, tutup, selepas }) {
             {pemain.map((p, i) => (
               <div key={i} className="flex gap-2">
                 <Input value={p.no_jersi} placeholder="No" className="w-16 text-center"
-                       onChange={(e) => ubah(i, 'no_jersi', e.target.value.replace(/\D/g, '').slice(0, 4))} />
+                       onChange={(e) => ubah(i, 'no_jersi', e.target.value.replace(/\D/g, '').slice(0, 2))} />
                 <Input value={p.nama} placeholder="Nama pemain" maxLength={80}
                        onChange={(e) => ubah(i, 'nama', e.target.value)} />
                 <button
@@ -75,7 +75,7 @@ function DialogSunting({ rekod, tutup, selepas }) {
               </div>
             ))}
           </div>
-          {pemain.length < 20 && (
+          {pemain.length < 10 && (
             <Button jenis="garis" className="mt-2 w-full" onClick={() => setPemain((s) => [...s, { nama: '', no_jersi: '' }])}>
               <UserPlus className="size-4" />Tambah pemain
             </Button>
@@ -153,7 +153,10 @@ export default function DaftarAdmin({ admin, muatSemula }) {
         {s.status === 'baru' && (
           <>
             <Button ukuran="sm" disabled={sibukId === s.id}
-                    onClick={() => buat(s.id, () => api.daftarLulus(s.id), `${s.nama} diluluskan — sedia untuk undian kumpulan.`)}>
+                    onClick={() => buat(s.id, async () => {
+                      const r = await api.daftarLulus(s.id)
+                      if (r.amaran) setTimeout(() => toast(r.amaran, 'ralat'), 600)
+                    }, `${s.nama} diluluskan — sedia untuk undian kumpulan.`)}>
               <Check className="size-3.5" />Lulus
             </Button>
             <Button ukuran="sm" jenis="garis" disabled={sibukId === s.id}

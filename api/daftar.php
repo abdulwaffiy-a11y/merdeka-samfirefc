@@ -27,8 +27,43 @@ require __DIR__ . '/lib/kejohanan.php';
 const LOGO_MAX_BAIT = 1048576;          // 1MB
 const DAFTAR_HAD_IP = 3;                // per jam
 const DAFTAR_HAD_JUMLAH = 60;
+const PEMAIN_MAKS = 10;                 // ikut peraturan kejohanan
 
 $action = (string)inp('action', 'senarai');
+
+/** Buang ruang di hujung & mampatkan ruang berganda jadi satu. */
+function kemasRuang(string $s): string
+{
+    return trim((string)preg_replace('/\s+/u', ' ', $s));
+}
+
+/**
+ * Bersihkan senarai pemain: buang baris kosong, tapis no. jersi kepada digit,
+ * buang nama berulang (huruf besar/kecil diabaikan) supaya tiada sijil pendua,
+ * dan hadkan bilangan.
+ */
+function bersihPemain(array $masuk, int $maks): array
+{
+    $keluar = [];
+    $dilihat = [];
+    foreach ($masuk as $p) {
+        if (!is_array($p)) continue;
+        $n = mb_substr(kemasRuang((string)($p['nama'] ?? '')), 0, 80);
+        if ($n === '') continue;
+
+        $kunci = mb_strtolower($n);
+        if (isset($dilihat[$kunci])) continue;      // nama sama diabaikan
+        $dilihat[$kunci] = true;
+
+        $j = preg_replace('/[^0-9]/', '', (string)($p['no_jersi'] ?? ''));
+        $j = mb_substr((string)$j, 0, 3);
+        if ($j !== '' && (int)$j > 99) $j = '';
+
+        $keluar[] = ['nama' => $n, 'no_jersi' => $j];
+        if (count($keluar) >= $maks) break;
+    }
+    return $keluar;
+}
 
 /* ------------------------------------------------------------- folder logo */
 function folderLogo(): string
@@ -88,8 +123,9 @@ if ($action === 'hantar') {
         fail('Pendaftaran telah penuh. Hubungi urus setia.', 409);
     }
 
-    $nama     = mb_substr(trim((string)inp('nama', '')), 0, 80);
-    $pengurus = mb_substr(trim((string)inp('pengurus', '')), 0, 80);
+    // ruang berganda dimampatkan supaya "SAMFIRE  FC" = "SAMFIRE FC" (elak nama pendua)
+    $nama     = mb_substr(kemasRuang((string)inp('nama', '')), 0, 80);
+    $pengurus = mb_substr(kemasRuang((string)inp('pengurus', '')), 0, 80);
     $telefon  = mb_substr(trim((string)inp('telefon', '')), 0, 30);
 
     if (mb_strlen($nama) < 3)     fail('Sila isi nama pasukan (sekurang-kurangnya 3 aksara).');
@@ -97,16 +133,10 @@ if ($action === 'hantar') {
     if (!preg_match('/^[0-9 +\-]{9,20}$/', $telefon)) fail('Sila isi nombor telefon yang sah (cth: 012-3456789).');
 
     // Pemain (JSON string dari borang) — maks 10
-    $pemainRaw = (string)inp('pemain', '[]');
-    $pemain = json_decode($pemainRaw, true);
+    $pemainRaw = inp('pemain', '[]');
+    $pemain = is_array($pemainRaw) ? $pemainRaw : json_decode((string)$pemainRaw, true);
     if (!is_array($pemain)) $pemain = [];
-    $pemainBersih = [];
-    foreach ($pemain as $p) {
-        $n = mb_substr(trim((string)($p['nama'] ?? '')), 0, 80);
-        if ($n === '') continue;
-        $pemainBersih[] = ['nama' => $n, 'no_jersi' => mb_substr(trim((string)($p['no_jersi'] ?? '')), 0, 4)];
-        if (count($pemainBersih) >= 10) break;
-    }
+    $pemainBersih = bersihPemain($pemain, PEMAIN_MAKS);
 
     // Nama tidak boleh sama dengan pendaftaran aktif atau pasukan sedia ada
     $kunci = mb_strtolower($nama);
@@ -164,11 +194,15 @@ if ($action === 'hantar') {
     );
     $st->execute([$nama, $pengurus, $telefon, json_encode($pemainBersih, JSON_UNESCAPED_UNICODE), $namaLogo, $ip]);
 
+    $idBaru = (int)db()->lastInsertId();
     audit(null, 'daftar_hantar', ['nama' => $nama, 'pemain' => count($pemainBersih), 'logo' => $namaLogo !== '']);
 
     ok([
-        'mesej' => 'Pendaftaran diterima! Urus setia akan menghubungi pengurus pasukan untuk pengesahan yuran '
-                 . tetapan('yuran', 'RM150') . '.',
+        'id'      => $idBaru,
+        'rujukan' => 'PSK-' . str_pad((string)$idBaru, 4, '0', STR_PAD_LEFT),
+        'pemain'  => count($pemainBersih),
+        'mesej'   => 'Pendaftaran diterima! Urus setia akan menghubungi pengurus pasukan untuk pengesahan yuran '
+                   . tetapan('yuran', 'RM200') . '.',
     ]);
 }
 
@@ -202,7 +236,22 @@ if ($action === 'lulus') {
 
     db()->prepare("UPDATE pendaftaran SET status = 'lulus' WHERE id = ?")->execute([$id]);
     audit($admin, 'daftar_lulus', ['nama' => $d['nama']]);
-    ok();
+
+    // Amaran awal: kolam undian tidak boleh melebihi slot kosong, kalau tidak
+    // undian kumpulan akan gagal nanti.
+    $dalamKolam = (int)db()->query(
+        "SELECT COUNT(*) FROM pendaftaran WHERE status = 'lulus' AND team_id IS NULL"
+    )->fetchColumn();
+    $slotKosong = (int)db()->query("SELECT COUNT(*) FROM teams WHERE nama = ''")->fetchColumn();
+
+    ok([
+        'dalam_kolam' => $dalamKolam,
+        'slot_kosong' => $slotKosong,
+        'amaran'      => $dalamKolam > $slotKosong
+            ? 'Kolam undian (' . $dalamKolam . ' pasukan) sudah melebihi slot kosong (' . $slotKosong
+              . '). Undian kumpulan akan gagal selagi lebihan tidak dikeluarkan.'
+            : '',
+    ]);
 }
 
 if ($action === 'kemas') {
@@ -218,22 +267,24 @@ if ($action === 'kemas') {
     $d = $st->fetch();
     if (!$d) fail('Pendaftaran tidak dijumpai.', 404);
 
-    $nama     = mb_substr(trim((string)inp('nama', $d['nama'])), 0, 80);
-    $pengurus = mb_substr(trim((string)inp('pengurus', $d['pengurus'])), 0, 80);
+    $nama     = mb_substr(kemasRuang((string)inp('nama', $d['nama'])), 0, 80);
+    $pengurus = mb_substr(kemasRuang((string)inp('pengurus', $d['pengurus'])), 0, 80);
     $telefon  = mb_substr(trim((string)inp('telefon', $d['telefon'])), 0, 30);
-    if (mb_strlen($nama) < 2) fail('Nama pasukan terlalu pendek.');
+    if (mb_strlen($nama) < 3) fail('Nama pasukan terlalu pendek (sekurang-kurangnya 3 aksara).');
+
+    // Nama tidak boleh berlanggar dengan pendaftaran lain atau pasukan sedia ada
+    $kunci = mb_strtolower($nama);
+    $st = db()->prepare("SELECT COUNT(*) FROM pendaftaran WHERE id <> ? AND status IN ('baru','lulus') AND LOWER(nama) = ?");
+    $st->execute([$id, $kunci]);
+    if ((int)$st->fetchColumn() > 0) fail('Nama pasukan ini sudah digunakan oleh pendaftaran lain.');
+    $st = db()->prepare('SELECT COUNT(*) FROM teams WHERE LOWER(nama) = ? AND id <> ?');
+    $st->execute([$kunci, (int)($d['team_id'] ?? 0)]);
+    if ((int)$st->fetchColumn() > 0) fail('Nama pasukan ini sudah wujud dalam jadual kumpulan.');
 
     $masuk = inp('pemain', null);
     $pemain = json_decode((string)$d['pemain_json'], true) ?: [];
     if (is_array($masuk)) {
-        $pemain = [];
-        foreach ($masuk as $p) {
-            $n = mb_substr(trim((string)($p['nama'] ?? '')), 0, 80);
-            if ($n === '') continue;
-            $j = preg_replace('/[^0-9]/', '', (string)($p['no_jersi'] ?? ''));
-            $pemain[] = ['nama' => $n, 'no_jersi' => mb_substr((string)$j, 0, 4)];
-            if (count($pemain) >= 20) break;
-        }
+        $pemain = bersihPemain($masuk, PEMAIN_MAKS);
     }
 
     $pdo = db();

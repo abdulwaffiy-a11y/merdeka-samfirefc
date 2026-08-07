@@ -28,14 +28,14 @@ function DialogPemain({ pasukan, pemainAsal, tutup, selepas }) {
         {senarai.length === 0 && <p className="py-4 text-center text-sm text-stone-500">Belum ada pemain. Tekan “Tambah pemain”.</p>}
         {senarai.map((p, i) => (
           <div key={i} className="flex gap-2">
-            <Input value={p.no_jersi} onChange={(e) => ubah(i, 'no_jersi', e.target.value.slice(0, 4))} placeholder="No" className="w-16 text-center" />
+            <Input value={p.no_jersi} onChange={(e) => ubah(i, 'no_jersi', e.target.value.replace(/\D/g, '').slice(0, 2))} placeholder="No" className="w-16 text-center" />
             <Input value={p.nama} onChange={(e) => ubah(i, 'nama', e.target.value)} placeholder="Nama pemain" />
             <button onClick={() => setSenarai((s) => s.filter((_, j) => j !== i))} className="grid size-10 shrink-0 place-items-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-600">
               <Trash2 className="size-4" />
             </button>
           </div>
         ))}
-        {senarai.length < 20 && (
+        {senarai.length < 10 && (
           <Button jenis="garis" className="w-full" onClick={() => setSenarai((s) => [...s, { nama: '', no_jersi: '' }])}>
             <UserPlus className="size-4" />Tambah pemain
           </Button>

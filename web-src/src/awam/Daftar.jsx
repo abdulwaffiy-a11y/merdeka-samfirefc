@@ -15,6 +15,7 @@ export default function Daftar({ data }) {
   const [logoUrl, setLogoUrl] = useState('')
   const [sibuk, setSibuk] = useState(false)
   const [berjaya, setBerjaya] = useState('')
+  const [rujukan, setRujukan] = useState('')
   const failRef = useRef(null)
 
   const muatSenarai = async () => {
@@ -60,6 +61,7 @@ export default function Daftar({ data }) {
       if (!d.ok) throw new Error(d.mesej || 'Pendaftaran gagal.')
 
       setBerjaya(d.mesej)
+      setRujukan(d.rujukan || '')
       setBorang({ nama: '', pengurus: '', telefon: '' })
       setPemain([{ nama: '', no_jersi: '' }])
       setLogo(null); setLogoUrl('')
@@ -102,7 +104,14 @@ export default function Daftar({ data }) {
             <CheckCircle2 className="mx-auto size-10 text-emerald-600" />
             <p className="mt-2 text-sm font-bold">Pendaftaran diterima!</p>
             <p className="mx-auto mt-1 max-w-sm text-[13px] text-stone-600 dark:text-stone-400">{berjaya}</p>
-            <Button jenis="garis" className="mt-4" onClick={() => setBerjaya('')}>Daftar pasukan lain</Button>
+            {rujukan && (
+              <div className="mx-auto mt-3 w-fit rounded-lg border border-gold-500/40 bg-gold-500/10 px-4 py-2">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-stone-500">No. Rujukan Pasukan</p>
+                <p className="tnum text-base font-black text-maroon-700 dark:text-maroon-300">{rujukan}</p>
+                <p className="mt-0.5 text-[11px] text-stone-500">Sebut nombor ini semasa membuat bayaran</p>
+              </div>
+            )}
+            <Button jenis="garis" className="mt-4" onClick={() => { setBerjaya(''); setRujukan('') }}>Daftar pasukan lain</Button>
           </CardBody>
         ) : !buka ? (
           <CardBody className="text-center text-sm text-stone-500">
@@ -156,8 +165,8 @@ export default function Daftar({ data }) {
                 <div className="space-y-2">
                   {pemain.map((p, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={p.no_jersi} maxLength={4} placeholder="No"
-                             onChange={(e) => setPemain((s) => s.map((x, j) => j === i ? { ...x, no_jersi: e.target.value } : x))}
+                      <Input value={p.no_jersi} maxLength={2} inputMode="numeric" placeholder="No"
+                             onChange={(e) => setPemain((s) => s.map((x, j) => j === i ? { ...x, no_jersi: e.target.value.replace(/\D/g, '').slice(0, 2) } : x))}
                              className="w-16 text-center" />
                       <Input value={p.nama} maxLength={80} placeholder={`Pemain ${i + 1}`}
                              onChange={(e) => setPemain((s) => s.map((x, j) => j === i ? { ...x, nama: e.target.value } : x))} />

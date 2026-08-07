@@ -429,7 +429,7 @@ $banyak = [];
 for ($i = 1; $i <= 25; $i++) $banyak[] = ['nama' => "Pemain $i", 'no_jersi' => (string)$i];
 $banyak[] = ['nama' => '   ', 'no_jersi' => '5'];
 $kemas3 = $admin->post('/api/daftar.php', ['action' => 'kemas'], ['id' => $idD, 'pemain' => $banyak]);
-sahkan(count($kemas3['pemain'] ?? []) === 20, 'Had maksimum 20 pemain dikuatkuasakan',
+sahkan(count($kemas3['pemain'] ?? []) === 10, 'Had maksimum 10 pemain dikuatkuasakan (ikut peraturan)',
        'dapat: ' . count($kemas3['pemain'] ?? []));
 
 /* Orang awam TIDAK boleh sunting */

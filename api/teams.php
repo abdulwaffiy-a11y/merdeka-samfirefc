@@ -12,6 +12,8 @@ declare(strict_types=1);
 require __DIR__ . '/lib/boot.php';
 require __DIR__ . '/lib/kejohanan.php';
 
+const PEMAIN_MAKS_PASUKAN = 10;   // ikut peraturan kejohanan
+
 $action = (string)inp('action', 'senarai');
 
 switch ($action) {
@@ -107,8 +109,8 @@ switch ($action) {
         $teamId = (int)inp('team_id', 0);
         $pemain = inp('pemain', []);
         if (!is_array($pemain)) $pemain = [];
-        if (count($pemain) > 20) {
-            fail('Maksimum 20 pemain setiap pasukan.');
+        if (count($pemain) > PEMAIN_MAKS_PASUKAN) {
+            fail('Maksimum ' . PEMAIN_MAKS_PASUKAN . ' pemain setiap pasukan.');
         }
 
         $st = db()->prepare('SELECT id, nama FROM teams WHERE id = ?');
@@ -122,16 +124,28 @@ switch ($action) {
             $pdo->prepare('DELETE FROM players WHERE team_id = ?')->execute([$teamId]);
             $ins = $pdo->prepare('INSERT INTO players (team_id, nama, no_jersi, no_kp) VALUES (?, ?, ?, ?)');
             $bil = 0;
+            $dilihat = [];
             foreach ($pemain as $p) {
-                $nama = mb_substr(trim((string)($p['nama'] ?? '')), 0, 80);
+                if (!is_array($p)) continue;
+                $nama = mb_substr(trim((string)preg_replace('/\s+/u', ' ', (string)($p['nama'] ?? ''))), 0, 80);
                 if ($nama === '') continue;
+
+                $kunci = mb_strtolower($nama);
+                if (isset($dilihat[$kunci])) continue;   // elak nama pendua -> sijil pendua
+                $dilihat[$kunci] = true;
+
+                $jersi = preg_replace('/[^0-9]/', '', (string)($p['no_jersi'] ?? ''));
+                $jersi = mb_substr((string)$jersi, 0, 3);
+                if ($jersi !== '' && (int)$jersi > 99) $jersi = '';
+
                 $ins->execute([
                     $teamId,
                     $nama,
-                    mb_substr(trim((string)($p['no_jersi'] ?? '')), 0, 4),
+                    $jersi,
                     mb_substr(trim((string)($p['no_kp'] ?? '')), 0, 20),
                 ]);
                 $bil++;
+                if ($bil >= PEMAIN_MAKS_PASUKAN) break;
             }
             $pdo->commit();
         } catch (Throwable $e) {
