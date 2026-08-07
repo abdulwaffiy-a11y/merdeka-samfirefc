@@ -6,3 +6,4 @@ api/uploads/
 *.zip
 .DS_Store
 Thumbs.db
+_to_delete/
