@@ -16,13 +16,14 @@ import Daftar from './awam/Daftar'
 import Ahli from './awam/Ahli'
 
 const TAB = [
-  { id: 'beranda',  label: 'Utama',    ikon: Home },
-  { id: 'kumpulan', label: 'Kumpulan', ikon: LayoutGrid },
-  { id: 'jadual',   label: 'Jadual',   ikon: CalendarDays },
-  { id: 'carta',    label: 'Carta',    ikon: GitBranch },
-  { id: 'pasukan',  label: 'Pasukan',  ikon: Users },
-  { id: 'daftar',   label: 'Daftar',   ikon: UserPlus },
-  { id: 'info',     label: 'Info',     ikon: Info },
+  // `pendek` = label untuk navigasi bawah telefon (ruang sempit)
+  { id: 'beranda',  label: 'Utama',    pendek: 'Utama',   ikon: Home },
+  { id: 'kumpulan', label: 'Kumpulan', pendek: 'Grup',    ikon: LayoutGrid },
+  { id: 'jadual',   label: 'Jadual',   pendek: 'Jadual',  ikon: CalendarDays },
+  { id: 'carta',    label: 'Carta',    pendek: 'Carta',   ikon: GitBranch },
+  { id: 'pasukan',  label: 'Pasukan',  pendek: 'Pasukan', ikon: Users },
+  { id: 'daftar',   label: 'Daftar',   pendek: 'Daftar',  ikon: UserPlus },
+  { id: 'info',     label: 'Info',     pendek: 'Info',    ikon: Info },
 ]
 
 function Memuat() {
@@ -64,7 +65,7 @@ function App() {
   }[tab]
 
   return (
-    <div className="min-h-dvh pb-20 md:pb-6">
+    <div className="min-h-dvh pb-24 md:pb-6">
       {/* ---- Bar atas ---- */}
       <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/85 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/85">
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2.5">
@@ -158,12 +159,17 @@ function App() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex min-w-0 flex-col items-center gap-0.5 px-0.5 py-2 text-[10px] font-semibold transition ${
-                tab === t.id ? 'text-maroon-700 dark:text-maroon-300' : 'text-stone-400'
+              aria-current={tab === t.id ? 'page' : undefined}
+              className={`flex min-w-0 flex-col items-center gap-1 px-0 pb-2 pt-1.5 text-[10px] font-bold tracking-tight transition active:scale-95 ${
+                tab === t.id ? 'text-maroon-700 dark:text-maroon-300' : 'text-stone-500 dark:text-stone-400'
               }`}
             >
-              <t.ikon className="size-[18px] shrink-0" />
-              <span className="w-full truncate text-center leading-tight">{t.label}</span>
+              <span className={`grid h-7 w-11 shrink-0 place-items-center rounded-full transition ${
+                tab === t.id ? 'bg-maroon-700/12 dark:bg-maroon-300/15' : ''
+              }`}>
+                <t.ikon className="size-[22px] shrink-0" strokeWidth={tab === t.id ? 2.4 : 2} />
+              </span>
+              <span className="w-full truncate text-center leading-tight">{t.pendek}</span>
             </button>
           ))}
         </div>
