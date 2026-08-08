@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ShieldCheck, Check, X, Trash2, Phone, FileSpreadsheet, RefreshCw, Lock, Unlock, Wallet } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Badge, useToast } from '../ui'
-import { getCsrf } from '../lib/api'
+import { getCsrf, jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -11,12 +11,14 @@ export default function AhliAdmin({ admin }) {
   const [sibukId, setSibukId] = useState(0)
   const [bayar, setBayar] = useState({ yuran_ahli: '', bayar_bank: '', bayar_akaun: '', bayar_kepada: '' })
   const [tapis, setTapis] = useState('baru')
+  const [ralat, setRalat] = useState('')
 
   const ambil = async () => {
     try {
       const r = await fetch(`${asasApi}/ahli.php?action=urus`, { credentials: 'same-origin' })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej)
+      setRalat('')
       setData(d)
       setBayar({
         yuran_ahli: d.bayaran.yuran || '',
@@ -24,7 +26,9 @@ export default function AhliAdmin({ admin }) {
         bayar_akaun: d.bayaran.bayar_akaun || '',
         bayar_kepada: d.bayaran.bayar_kepada || '',
       })
-    } catch (e) { toast(e.message || 'Tidak dapat memuat senarai ahli.', 'ralat') }
+    } catch (e) {
+      setRalat(e.message || 'Tidak dapat memuat senarai ahli.')
+    }
   }
   useEffect(() => { ambil() }, [])
 
@@ -34,7 +38,7 @@ export default function AhliAdmin({ admin }) {
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrf() || '' },
       body: JSON.stringify(badan),
     })
-    const d = await r.json()
+    const d = await jsonSelamat(r)
     if (!d.ok) throw new Error(d.mesej)
     return d
   }
@@ -45,7 +49,28 @@ export default function AhliAdmin({ admin }) {
     catch (e) { toast(e.message, 'ralat') } finally { setSibukId(0) }
   }
 
-  if (!data) return null
+  // Jangan hilang senyap — tunjukkan sebab & butang cuba semula
+  if (!data) {
+    if (!ralat) return null
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><ShieldCheck className="size-4" />Keahlian SAMFIRE FC</CardTitle>
+          <Badge jenis="maroon">Tidak dapat dimuat</Badge>
+        </CardHeader>
+        <CardBody className="space-y-3">
+          <p className="text-[13px] text-stone-600 dark:text-stone-400">{ralat}</p>
+          <p className="text-[11px] leading-relaxed text-stone-400">
+            Selalunya ini bermakna fail <code>api/ahli.php</code> belum naik ke pelayan.
+            Jalankan deploy sekali lagi, kemudian tekan Cuba Semula.
+          </p>
+          <Button jenis="garis" ukuran="sm" onClick={ambil}>
+            <RefreshCw className="size-3.5" />Cuba semula
+          </Button>
+        </CardBody>
+      </Card>
+    )
+  }
 
   const k = data.kiraan
   const senarai = data.ahli.filter((a) => (tapis === 'semua' ? true : a.status === tapis))

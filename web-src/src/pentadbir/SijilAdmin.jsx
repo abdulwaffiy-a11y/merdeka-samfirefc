@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Award, Copy, ExternalLink, Trash2, PenLine, Check, RefreshCw } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Badge, useToast } from '../ui'
-import { getCsrf } from '../lib/api'
+import { getCsrf, jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -29,7 +29,7 @@ export default function SijilAdmin() {
   const ambil = async () => {
     try {
       const r = await fetch(`${asasApi}/sijil.php?action=pautan`, { credentials: 'same-origin' })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej)
       setData(d)
       setTtd({
@@ -51,7 +51,7 @@ export default function SijilAdmin() {
         method: 'POST', body: fd, credentials: 'same-origin',
         headers: { 'X-CSRF-Token': getCsrf() || '' },
       })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej)
       toast('Tandatangan dimuat naik.', 'ok')
       ambil()
@@ -64,7 +64,7 @@ export default function SijilAdmin() {
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrf() || '' },
       body: JSON.stringify(badan),
     })
-    const d = await r.json()
+    const d = await jsonSelamat(r)
     if (!d.ok) throw new Error(d.mesej)
     return d
   }
@@ -123,7 +123,7 @@ export default function SijilAdmin() {
               <input
                 type="file" accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => naikTtd(e.target.files?.[0])} disabled={sibuk}
-                className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
+                className="w-full max-w-full min-w-0 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
               />
               <p className="text-[11px] text-stone-400">
                 PNG latar telus paling kemas. Maksimum 2MB. Imbas atau ambil gambar tandatangan di atas kertas putih.

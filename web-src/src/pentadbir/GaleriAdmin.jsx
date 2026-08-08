@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Images, Trash2, Upload, Loader2, Check } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Badge, useToast } from '../ui'
-import { getCsrf } from '../lib/api'
+import { getCsrf, jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -18,7 +18,7 @@ async function hantar(action, badan, jsonMode = false) {
     opsyen.body = badan
   }
   const r = await fetch(`${asasApi}/galeri.php?action=${action}`, opsyen)
-  const d = await r.json()
+  const d = await jsonSelamat(r)
   if (!d.ok) throw new Error(d.mesej || 'Ralat.')
   return d
 }
@@ -34,7 +34,7 @@ export default function GaleriAdmin() {
   const ambil = async () => {
     try {
       const r = await fetch(`${asasApi}/galeri.php?action=senarai`)
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (d.ok) setSenarai(d.galeri || [])
     } catch { /* biarkan */ }
   }
@@ -102,7 +102,7 @@ export default function GaleriAdmin() {
             multiple
             onChange={(e) => naik(e.target.files)}
             disabled={sibuk}
-            className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white disabled:opacity-50"
+            className="w-full max-w-full min-w-0 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white disabled:opacity-50"
           />
           {sibuk && (
             <span className="flex items-center gap-2 text-[12px] text-stone-500">

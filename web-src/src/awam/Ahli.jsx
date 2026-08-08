@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ShieldCheck, Upload, Trash2, CheckCircle2, Loader2, Wallet, Users } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Select, Badge, useToast } from '../ui'
+import { jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -27,7 +28,7 @@ export default function Ahli() {
   const refB = useRef(null)
 
   useEffect(() => {
-    fetch(`${asasApi}/ahli.php?action=info`).then((r) => r.json())
+    fetch(`${asasApi}/ahli.php?action=info`).then((r) => jsonSelamat(r))
       .then((d) => { if (d.ok) setInfo(d) }).catch(() => {})
   }, [])
 
@@ -53,7 +54,7 @@ export default function Ahli() {
       if (bukti) fd.append('bukti', bukti)
 
       const r = await fetch(`${asasApi}/ahli.php?action=hantar`, { method: 'POST', body: fd })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej || 'Pendaftaran gagal.')
 
       setBerjaya(d.mesej)
@@ -232,7 +233,7 @@ export default function Ahli() {
                         ? <img src={gambarUrl} alt="" className="size-14 rounded-lg border border-stone-200 object-cover dark:border-stone-700" />
                         : <div className="grid size-14 place-items-center rounded-lg border border-dashed border-stone-300 text-stone-300 dark:border-stone-700"><Upload className="size-5" /></div>}
                       <input ref={refG} type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => pilihImej(e, 'gambar')}
-                             className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+                             className="w-full max-w-full min-w-0 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
                       {gambar && (
                         <button type="button" onClick={() => { setGambar(null); setGambarUrl(''); if (refG.current) refG.current.value = '' }}
                                 className="text-stone-400 hover:text-red-600"><Trash2 className="size-4" /></button>
@@ -242,7 +243,7 @@ export default function Ahli() {
                   <div>
                     <Label>Bukti pembayaran {b?.yuran || 'RM15'}</Label>
                     <input ref={refB} type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => pilihImej(e, 'bukti')}
-                           className="mt-2 w-full text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-navy-800 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+                           className="mt-2 w-full max-w-full min-w-0 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-navy-800 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
                     {bukti && <p className="mt-1 text-[11px] text-emerald-600">{bukti.name} sedia dihantar</p>}
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { DatabaseBackup, Download, ShieldCheck, RefreshCw, AlertTriangle, FileSpreadsheet } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Badge, useToast } from '../ui'
+import { jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -14,7 +15,7 @@ export default function SandaranAdmin() {
   const ambil = async () => {
     try {
       const r = await fetch(`${asasApi}/backup.php?action=senarai`, { credentials: 'same-origin' })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (d.ok) setData(d)
       else toast(d.mesej, 'ralat')
     } catch (e) { toast('Tidak dapat membaca senarai sandaran.', 'ralat') }
@@ -25,7 +26,7 @@ export default function SandaranAdmin() {
     setSibuk(true)
     try {
       const r = await fetch(`${asasApi}/backup.php?action=jana`, { credentials: 'same-origin' })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej)
       toast(`Sandaran dibuat: ${d.fail} (${saiz(d.saiz)})`, 'ok')
       ambil()

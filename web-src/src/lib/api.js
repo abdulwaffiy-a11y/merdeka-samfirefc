@@ -15,6 +15,33 @@ class RalatApi extends Error {
 }
 export { RalatApi }
 
+/**
+ * Baca jawapan fetch sebagai JSON dengan selamat.
+ *
+ * Kalau pelayan pulangkan HTML (halaman ralat 404/500 Apache atau amaran PHP),
+ * `res.json()` akan lempar mesej pelayar yang mengelirukan — contohnya Safari
+ * iPhone menunjukkan "The string did not match the expected pattern."
+ * Fungsi ini menggantikannya dengan mesej Bahasa Melayu yang berguna.
+ */
+export async function jsonSelamat(res) {
+  const teks = await res.text()
+  try {
+    return JSON.parse(teks)
+  } catch {
+    const petunjuk = /^\s*</.test(teks) ? ' Pelayan memulangkan halaman HTML, bukan data.' : ''
+    if (res.status === 404) {
+      throw new RalatApi('Fail API tidak dijumpai di pelayan (404). Sila jalankan deploy semula.', 404)
+    }
+    if (res.status === 401 || res.status === 403) {
+      throw new RalatApi('Sesi tamat atau tiada kebenaran. Sila log masuk semula.', res.status)
+    }
+    throw new RalatApi(
+      `Pelayan memulangkan jawapan tidak sah (HTTP ${res.status}).${petunjuk} Sila cuba lagi.`,
+      res.status,
+    )
+  }
+}
+
 async function panggil(fail, params = {}, badan = null, opsyen = {}) {
   const url = new URL(`${asas}/${fail}`)
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))

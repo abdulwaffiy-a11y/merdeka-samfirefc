@@ -33,6 +33,14 @@
 @layer base {
   html { -webkit-text-size-adjust: 100%; }
   body { font-family: var(--font-sans); }
+
+  /* Jaring keselamatan: tiada skrol mendatar pada telefon.
+     `clip` (bukan `hidden`) supaya header melekat (position: sticky) kekal berfungsi. */
+  html, body { overflow-x: clip; max-width: 100%; }
+
+  /* Elemen yang sering melimpah pada skrin sempit */
+  img, video, canvas, svg, iframe { max-width: 100%; }
+  input[type="file"] { max-width: 100%; }
   /* Nombor sejajar dalam jadual kedudukan */
   .tnum { font-variant-numeric: tabular-nums; }
 }

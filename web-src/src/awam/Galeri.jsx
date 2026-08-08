@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Images, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Card, CardHeader, CardTitle } from '../ui'
+import { jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -12,7 +13,7 @@ export default function Galeri() {
   useEffect(() => {
     let hidup = true
     fetch(`${asasApi}/galeri.php?action=senarai`)
-      .then((r) => r.json())
+      .then((r) => jsonSelamat(r))
       .then((d) => { if (hidup && d.ok) setSenarai(d.galeri || []) })
       .catch(() => {})
     return () => { hidup = false }

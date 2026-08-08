@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { UserPlus, Users, Trash2, Upload, CheckCircle2, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Badge, useToast } from '../ui'
+import { jsonSelamat } from '../lib/api'
 
 const asasApi = new URL('api/', document.baseURI).href.replace(/\/$/, '')
 
@@ -21,7 +22,7 @@ export default function Daftar({ data }) {
   const muatSenarai = async () => {
     try {
       const r = await fetch(`${asasApi}/daftar.php?action=senarai`)
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (d.ok) setInfo(d)
     } catch { /* biarkan */ }
   }
@@ -57,7 +58,7 @@ export default function Daftar({ data }) {
       if (logo) fd.append('logo', logo)
 
       const r = await fetch(`${asasApi}/daftar.php?action=hantar`, { method: 'POST', body: fd })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej || 'Pendaftaran gagal.')
 
       setBerjaya(d.mesej)
@@ -151,7 +152,7 @@ export default function Daftar({ data }) {
                     ? <img src={logoUrl} alt="" className="size-14 rounded-lg border border-stone-200 object-contain dark:border-stone-700" />
                     : <div className="grid size-14 place-items-center rounded-lg border border-dashed border-stone-300 text-stone-300 dark:border-stone-700"><Upload className="size-5" /></div>}
                   <input ref={failRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={pilihLogo}
-                         className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+                         className="w-full max-w-full min-w-0 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
                   {logo && (
                     <button type="button" onClick={() => { setLogo(null); setLogoUrl(''); if (failRef.current) failRef.current.value = '' }}
                             className="text-stone-400 hover:text-red-600"><Trash2 className="size-4" /></button>

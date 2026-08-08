@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { UserPlus, Trash2, KeyRound, ShieldCheck, Lock, Unlock, Megaphone, Image as ImageIcon } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardBody, Button, Input, Label, Select, Badge, Dialog, useToast } from '../ui'
-import { api, getCsrf } from '../lib/api'
+import { api, getCsrf, jsonSelamat } from '../lib/api'
 import GaleriAdmin from './GaleriAdmin'
 import SandaranAdmin from './SandaranAdmin'
 import SijilAdmin from './SijilAdmin'
@@ -37,7 +37,7 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
         method: 'POST', body: fd, credentials: 'same-origin',
         headers: { 'X-CSRF-Token': getCsrf() || '' },
       })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej || 'Muat naik gagal.')
       toast(`Poster dimuat naik (${d.dimensi}).`, 'ok')
       muatSemula()
@@ -52,7 +52,7 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrf() || '' },
         body: '{}',
       })
-      const d = await r.json()
+      const d = await jsonSelamat(r)
       if (!d.ok) throw new Error(d.mesej)
       toast('Poster dibuang.', 'ok')
       muatSemula()
@@ -146,7 +146,7 @@ export default function AkaunAdmin({ admin, awam, muatSemula }) {
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(e) => naikPoster(e.target.files?.[0])}
-                    className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
+                    className="w-full max-w-full min-w-0 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-maroon-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
                   />
                   {naikSibuk && <p className="text-[12px] text-stone-500">Memuat naik…</p>}
                   {awam.tetapan.poster && (
